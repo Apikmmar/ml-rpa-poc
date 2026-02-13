@@ -13,14 +13,15 @@
 4. Configure:
    - **Name**: ml-rpa-backend
    - **Environment**: Python 3
+   - **Root Directory**: (leave empty)
    - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`
+   - **Start Command**: `cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT`
    - **Plan**: Free
 5. Add Environment Variables:
    - `AIRTABLE_TOKEN` = your_token
    - `AIRTABLE_BASE_ID` = your_base_id
 6. Click "Create Web Service"
-7. Copy your backend URL (e.g., https://ml-rpa-backend.onrender.com)
+7. Your app URL: https://ml-rpa-backend.onrender.com
 
 ## Deploy Frontend (Static Site)
 
