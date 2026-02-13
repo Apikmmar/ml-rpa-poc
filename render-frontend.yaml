@@ -1,7 +1,0 @@
-version: 1
-services:
-  - type: web
-    name: ml-rpa-frontend
-    env: static
-    buildCommand: echo "No build needed"
-    staticPublishPath: ./frontend
