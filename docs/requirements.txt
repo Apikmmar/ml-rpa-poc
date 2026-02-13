@@ -1,0 +1,182 @@
+### Robotic Process Automation (RPA)
+
+### **Objective**
+
+- Automate repetitive, rule-based warehouse tasks (picking, transfers, reporting).
+- Speed up order processing while lowering human error.
+
+### **Expected Outcomes**
+
+- **30–40% faster picking process** with automated pick-list creation
+
+## **Steps:**
+
+1. **Identify Processes to Automate**
+    - Pick-list generation from customer orders.
+    - Stock transfer orders (between racks/zones).
+    - Goods receipt & updating WMS/ERP.
+    - Daily/weekly stock reconciliation reports.
+2. **Design Automated Workflows**
+    - RPA bots read incoming orders from ERP.
+    - Automatically generate pick-lists and send to staff handheld devices or AGVs (if available)
+    - After picking/transfer, bots update WMS in real time.
+    - Generate exception reports (e.g., shortages, mismatched counts).
+3. **Pilot on One Workflow**
+    - Start with **pick-list automation** for solar panels/inverters.
+    - Run in parallel with manual process to validate accuracy.
+4. **Roll Out Across Warehouse**
+    - Expand to goods receipt, stock transfers, and reporting.
+    - Integrate with procurement and logistics for end-to-end automation
+
+### **Support Resources**
+
+- **Cloud Services**:
+    - AWS Step Functions + Lambda
+
+### Steps (example flow)
+
+1. **Trigger**
+    - New order event from ERP (via webhook/EventBridge), or a CSV dropped in S3, or a message in SQS.
+2. **Validate order** (Lambda)
+    - Check SKU codes, quantities, customer priority.
+3. **Check stock & location** (Lambda)
+    - Read WMS/Inventory API to confirm availability by rack/bin.
+4. **Reserve stock** (Lambda)
+    - Call WMS API to reserve quantities; if partial, branch logic handles backorder.
+5. **Create pick list** (Lambda)
+    - Post to WMS: generate pick task(s) with rack/bin targets.
+6. **Notify floor** (Lambda)
+    - Send to handheld app, email, Slack, or SNS SMS.
+7. **Update ERP** (Lambda)
+    - Write back order status (“Picking”), ETA.
+8. **Audit & metrics** (Lambda)
+    - Log to DynamoDB (trace), push metrics to CloudWatch.
+9. **Done / alert**
+    - Success path → finish; error path → retry/compensation + alert ops
+
+-------------------------------------------------------------------------------------
+
+1. Order Validator
+Input: Order JSON from ERP
+Process:
+  - Check required fields (order_id, customer_id, items, SKUs)
+  - Validate SKU format
+  - Check customer priority
+  - Verify quantities > 0
+Output: {valid: true/false, errors: []}
+
+
+2. Stock Checker
+Input: List of SKUs + quantities
+Process:
+  - Call WMS API for each SKU
+  - Get current stock levels
+  - Get rack/bin locations
+  - Check availability
+Output: {available: true/false, locations: {}, shortages: []}
+
+
+3. Stock Reserver
+Input: Order items + locations
+Process:
+  - Call WMS API to reserve stock
+  - Lock quantities temporarily
+  - Handle partial availability
+Output: {reserved: true/false, reservation_id: ""}
+
+
+4. Pick-List Generator
+Input: Order + reserved stock + locations
+Process:
+  - Create pick tasks with priorities
+  - Optimize picking route (by zone/rack)
+  - Generate barcode/QR codes
+  - Post to WMS
+Output: {picklist_id: "", tasks: [], route: []}
+
+
+5. Notification Sender
+Input: Pick-list details
+Process:
+  - Send to handheld devices (via API/SNS)
+  - Email warehouse staff
+  - Slack/Teams notification
+  - SMS for urgent orders
+Output: {notified: true, channels: []}
+
+
+6. ERP Updater
+Input: Order status + pick-list ID
+Process:
+  - Call ERP API
+  - Update order status ("Picking", "Ready", "Shipped")
+  - Set ETA
+  - Log timestamps
+Output: {updated: true, new_status: ""}
+
+
+7. Exception Handler
+Input: Error/shortage details
+Process:
+  - Generate exception report
+  - Alert ops team
+  - Create backorder if needed
+  - Log to DynamoDB
+Output: {exception_id: "", action_taken: ""}
+
+
+8. Audit Logger
+Input: All workflow data
+Process:
+  - Write to DynamoDB
+  - Push metrics to CloudWatch
+  - Track processing time
+  - Record API calls
+Output: {logged: true, trace_id: ""}
+
+
+9. Stock Transfer Bot (Bonus)
+Input: Transfer request (from rack A to rack B)
+Process:
+  - Validate source/destination
+  - Check permissions
+  - Update WMS locations
+  - Generate transfer task
+Output: {transfer_id: "", status: ""}
+
+----------------------------------------------------------------------
+
+START
+  ↓
+[1] Trigger (S3/SQS/EventBridge)
+  ↓
+[2] Order Validator
+  ├─ Invalid → Exception Handler → END
+  ↓ Valid
+[3] Stock Checker
+  ├─ Not Available → Exception Handler → Backorder → END
+  ↓ Available
+[4] Stock Reserver
+  ├─ Fail → Exception Handler → Retry (3x) → END
+  ↓ Success
+[5] Pick-List Generator
+  ↓
+[6] Notification Sender (Parallel)
+  ├─ Handheld devices
+  ├─ Email
+  └─ Slack/SMS
+  ↓
+[7] ERP Updater
+  ↓
+[8] Audit Logger
+  ↓
+END (Success)
+
+Error Path (any step):
+  → Exception Handler
+  → Audit Logger
+  → Alert Ops
+  → END
+
+
+=-RPA Framework

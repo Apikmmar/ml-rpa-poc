@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - RPA Automation</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="orders.html">Orders</a>
+        <a href="picklists.html">Picklists</a>
+        <a href="stocks.html">Stocks</a>
+        <a href="transfers.html">Transfers</a>
+        <a href="reports.html" class="active">Reports</a>
+        <a href="monitoring.html">Monitoring</a>
+    </nav>
+
+    <div class="container">
+        <h1>Reports</h1>
+
+        <div class="card">
+            <h2>Generate Stock Reconciliation</h2>
+            <button onclick="generateReconciliation()">Generate Report</button>
+            <div id="reconciliationResult" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h2>All Reports</h2>
+            <button onclick="listReports()">Load Reports</button>
+            <div id="reportsResult" class="result"></div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/reports.js"></script>
+</body>
+</html>

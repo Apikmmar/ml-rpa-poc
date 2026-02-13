@@ -1,0 +1,56 @@
+async function createTransfer() {
+    const params = new URLSearchParams({
+        from_location: document.getElementById('fromLocation').value,
+        to_location: document.getElementById('toLocation').value,
+        from_rack: document.getElementById('fromRack').value,
+        to_rack: document.getElementById('toRack').value,
+        sku: document.getElementById('transferSku').value,
+        quantity: document.getElementById('transferQty').value,
+        requested_by: document.getElementById('requestedBy').value
+    });
+
+    const resultDiv = document.getElementById('transferResult');
+    resultDiv.style.display = 'block';
+    resultDiv.textContent = 'Creating transfer...';
+
+    try {
+        const result = await fetch(`${API_URL}/stock-transfers?${params}`, { method: 'POST' });
+        const json = await result.json();
+        resultDiv.textContent = JSON.stringify(json, null, 2);
+    } catch (error) {
+        resultDiv.textContent = 'Error: ' + error.message;
+    }
+}
+
+async function listTransfers() {
+    const resultDiv = document.getElementById('transfersResult');
+    resultDiv.style.display = 'block';
+    resultDiv.textContent = 'Loading transfers...';
+
+    try {
+        const result = await fetch(`${API_URL}/stock-transfers`);
+        const json = await result.json();
+        
+        if (json.records && json.records.length > 0) {
+            let table = '<table><thead><tr><th>SKU</th><th>Quantity</th><th>From</th><th>To</th><th>Status</th><th>Requested By</th><th>Created</th></tr></thead><tbody>';
+            json.records.forEach(record => {
+                const fields = record.fields;
+                table += `<tr>
+                    <td>${fields.sku || 'N/A'}</td>
+                    <td>${fields.quantity || 0}</td>
+                    <td>${fields.from_location || 'N/A'}/${fields.from_rack || 'N/A'}</td>
+                    <td>${fields.to_location || 'N/A'}/${fields.to_rack || 'N/A'}</td>
+                    <td>${fields.status || 'N/A'}</td>
+                    <td>${fields.requested_by || 'N/A'}</td>
+                    <td>${fields.created_at ? new Date(fields.created_at).toLocaleString() : 'N/A'}</td>
+                </tr>`;
+            });
+            table += '</tbody></table>';
+            resultDiv.innerHTML = table;
+        } else {
+            resultDiv.textContent = 'No transfers found';
+        }
+    } catch (error) {
+        resultDiv.textContent = 'Error: ' + error.message;
+    }
+}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders - RPA</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="orders.html" class="active">Orders</a>
+        <a href="picklists.html">Picklists</a>
+        <a href="stocks.html">Stocks</a>
+        <a href="transfers.html">Transfers</a>
+        <a href="reports.html">Reports</a>
+        <a href="monitoring.html">Monitoring</a>
+    </nav>
+
+    <div class="container">
+        <h1>Orders Management</h1>
+
+        <div class="card">
+            <h2>Create New Order</h2>
+            <input type="email" id="customerEmail" placeholder="Customer Email">
+            <input type="text" id="customerId" placeholder="Customer ID">
+            <select id="priority">
+                <option value="Normal">Normal</option>
+                <option value="High">High</option>
+                <option value="Urgent">Urgent</option>
+            </select>
+            <div id="itemsContainer">
+                <div class="item-row">
+                    <input type="text" placeholder="SKU" class="item-sku">
+                    <input type="number" placeholder="Quantity" class="item-qty" min="1">
+                    <button onclick="removeItem(this)" type="button">Remove</button>
+                </div>
+            </div>
+            <button onclick="addItem()">+ Add Item</button>
+            <button onclick="createOrder()">Create Order</button>
+            <button onclick="clearForm()" type="button">Clear Form</button>
+            <div id="orderResult" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h2>All Orders</h2>
+            <button onclick="listOrders()">Refresh Orders</button>
+            <div id="ordersResult" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h2>Update Order Status</h2>
+            <input type="text" id="updateOrderId" placeholder="Order ID (rec...)">
+            <select id="updateStatus">
+                <option value="Validated">Validated</option>
+                <option value="Stock Confirmed">Stock Confirmed</option>
+                <option value="Reserved">Reserved</option>
+                <option value="Picking">Picking</option>
+                <option value="Ready">Ready</option>
+                <option value="Shipped">Shipped</option>
+                <option value="Cancelled">Cancelled</option>
+            </select>
+            <button onclick="updateOrderStatus()">Update Status</button>
+            <div id="updateOrderResult" class="result"></div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/orders.js"></script>
+</body>
+</html>

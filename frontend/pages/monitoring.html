@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring - RPA</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="orders.html">Orders</a>
+        <a href="picklists.html">Picklists</a>
+        <a href="stocks.html">Stocks</a>
+        <a href="transfers.html">Transfers</a>
+        <a href="reports.html">Reports</a>
+        <a href="monitoring.html" class="active">Monitoring</a>
+    </nav>
+
+    <div class="container">
+        <h1>Monitoring & Logs</h1>
+
+        <div class="card">
+            <h2>Metrics Dashboard</h2>
+            <button onclick="getMetrics()">Load Metrics</button>
+            <div id="metricsResult" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h2>Exceptions</h2>
+            <button onclick="listExceptions()">Refresh Exceptions</button>
+            <div id="exceptionsResult" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h2>Audit Logs</h2>
+            <button onclick="listAuditLogs()">Refresh Audit Logs</button>
+            <div id="auditLogsResult" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h2>Backorders</h2>
+            <button onclick="listBackorders()">Load Backorders</button>
+            <div id="backordersResult" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h2>Notifications</h2>
+            <button onclick="listNotifications()">Load Notifications</button>
+            <div id="notificationsResult" class="result"></div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/monitoring.js"></script>
+</body>
+</html>

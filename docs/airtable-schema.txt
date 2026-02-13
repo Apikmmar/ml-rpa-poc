@@ -1,0 +1,435 @@
+Sheet(DB) 
+Orders
+Data
+Data Type
+order_id
+RECORD_ID()
+created_at
+Date ISO
+created_by
+System
+updated_at
+Date ISO
+updated_by
+System
+customer_email
+Single line text
+customer_id
+Single line text
+priority
+Single Select(High, Normal, Urgent)
+status
+Single Select(Pending, Validated, Checking Stock, Picking, Ready, Shipped, Failed, Stock Confirmed, Reserved, Expired, Cancelled)
+validation_errors
+Single line text
+stock_validation
+Formula[ IF(all_item_avb = TRUE(), "Passed", "Failed") ]
+all_item_avb
+Rollup(Order_Items -> stock_sufficient)[ARRAYUNIQUE(values)]
+Order_Items
+Link to Order_Items
+Picklists
+Link to Picklists
+Reservations
+Link to Order_Items
+Notifications
+Link to Notifications
+AuditLogs
+Link to AuditLogs
+Backorders
+Link to Backorders
+
+
+Stocks
+Data
+Data Type
+stock_id
+RECORD_ID()
+created_at
+Date ISO
+created_by
+System
+updated_at
+Date ISO
+updated_by
+System
+sku
+Single line text
+quantity
+Formula[ def_quantity + add_stock - minus stock ]
+reserved
+Rollup(Order_Items -> qty WHERE order_cancelled = false AND order_picked = False)[SUM(values))]
+available
+Formula[ quantity - reserved ]
+def_quantity
+Number
+add_stock
+Number
+minus_stock
+Rollup(Order_Items -> qty WHERE order_picked = true)[SUM(values)]
+location
+Single select(Zone-A, Zone-B, Zone-C)
+rack
+Single select(Rack-1, Rack-2, Rack-3)
+stock_percentage
+Formula[ (available / quantity) * 100 ]
+Order_Items
+Link to Order_Items
+Stock_Transfers
+Link to Stock_Transfers
+Notifications
+Link to Notifications
+
+
+Order_Items
+Data
+Data Type
+item_id
+RECORD_ID()
+created_at
+Date ISO
+created_by
+System
+updated_at
+Date ISO
+updated_by
+System
+order_id
+Link to Orders
+sku
+Link to Stocks
+lookup_sku
+Lookup(sku -> sku)
+item_sku
+FORMULA[ lookup_sku ]
+qty
+Number
+avb_qty
+Lookup(sku -> available)
+order_status
+Lookup(order_id -> status)
+stock_sufficient
+FORMULA[ IF(qty <= avb_qty, TRUE(), FALSE()) ]
+order_cancelled
+Checkbox
+order_picked
+Checkbox
+Orders
+Link to Orders
+
+
+Picklists
+Data
+Data Type
+picklist_id
+RECORD_ID()
+created_at
+Date ISO
+created_by
+System
+updated_at
+Date ISO
+updated_by
+System
+order_id
+Link to Orders
+priority
+Lookup(order_id -> priority)
+status
+Single select(Created, In Progress, Completed)
+customer_email
+Single line text
+
+
+AuditLogs
+Data
+Data Type
+log_id
+RECORD_ID()
+created_at
+Date ISO
+created_by
+System
+updated_at
+Date ISO
+updated_by
+System
+order_id
+Link to Orders
+step
+Single line text
+status
+Single select(Success, Failed)
+
+
+Stock_Transfers
+Data
+Data Type
+transfer_id
+RECORD_ID()
+created_at
+Date ISO
+created_by
+System
+updated_at
+Date ISO
+updated_by
+System
+from_location
+Single line text
+to_location
+Single line text
+from_rack
+Single line text
+to_rack
+Single line text
+sku
+Single line text
+quantity
+Number
+status
+Single select(Pending, In Progress, Completed, Failed)
+requested_by
+Single line text
+approved_by
+Single line text
+
+
+Exceptions
+Data
+Data Type
+exception_id
+RECORD_ID()
+created_at
+Date ISO
+created_by
+System
+updated_at
+Date ISO
+updated_by
+System
+related_id
+Single line text
+error_type
+Single select(Validation Error, Stock Unavailable, Partial Stock, Stock Shortage, System Error)
+error_message
+Single line text
+severity
+Single select(Low, Medium, High Critical)
+status
+Single select(Open, Resolved)
+assigned_to
+Single select(Ops Team, Stock Team)
+
+
+Notifications
+Data
+Data Type
+notification_id
+RECORD_ID()
+created_at
+Date ISO
+created_by
+System
+updated_at
+Date ISO
+updated_by
+System
+order_id
+Link to Orders
+stock_id
+Link to Stocks
+customer_email
+Lookup(order_id -> custom_order_id)
+type
+Single select(Email)
+recipient
+Single line text
+
+
+Backorders
+Data
+Data Type
+backorder_id
+RECORD_ID()
+created_at
+Date ISO
+created_by
+System
+updated_at
+Date ISO
+updated_by
+System
+original_order_id
+Link to Orders
+items
+Long text
+status
+Single select(Pending, Fulfilled, Cancelled)
+link_sku
+Link to Stock
+sku
+Lookup(link_sku -> sku)
+qty_needed
+Number
+
+
+
+Automation 
+Order Validator
+When a record enters a view Orders
+Find records in Order_Items WHERE order_id = Airtable record ID
+IF Records length is 0
+UPDATE Orders status=Failed, validation_errors= “No Items”
+CREATE AuditLogs
+ELSE
+UPDATE Orders status=Validated
+CREATE AuditLogs
+
+Stock Checker
+When a record matches conditions Orders WHERE status is Validated
+IF stock_validation is Passed
+UPDATE Orders status=Stock Confirmed
+CREATE AuditLogs
+ELSE
+UPDATE Orders status=Failed
+CREATE Backorders
+SEND Email
+CREATE Notifications
+CREATE Exceptions
+CREATE AuditLogs
+
+Picklist Generator
+When a record matches conditions Orders WHERE status is Stock Confirmed
+CREATE Picklists
+UPDATE Orders status=Reserved, Picklists=Picklist.picklis_id, Order.customer_email
+CREATE AuditLogs
+SEND Email
+CREATE Notifications
+CREATE AuditLogs Notification
+
+High Priority Alert
+When a record is created in Picklists
+IF priority has any of High OR Urgent
+SEND Email
+CREATE Notifications
+CREATE AuditLogs
+Exception Alert
+When a record is created in Exceptions
+IF severity has any of High OR Critical
+SEND Email
+UPDATE Exception assigned_to=Ops Team, status=Open
+CREATE Notification
+CREATE AuditLogs
+
+Low Stock Alert
+When a record enters a view Stocks
+IF stock_percentave <=50
+SEND Email
+CREATE Notifications
+CREATE Exceptions
+
+Transfer Approval
+When a record is created in Stock_Transfers
+IF quantity <= 30
+UPDATE Stock_Transfers status=Completed
+CREATE AuditLogs
+ELIF quantity >
+UPDATE Stock_Transfers status=Pending
+SEND Email
+CREATE Notifications
+CREATE AuditLogs
+
+Picklist Completer
+When a record matches conditions Picklists WHERE status is Completed
+Find Orders WHERE Picklists contains picklist_id
+UPDATE Orders status=Ready
+SEND Email
+CREATE Notifications
+CREATE AuditLogs
+FIND Order_Items WHERE Order_Items.order_id = Orders.order_id
+REPEAT UPDATE Order_Items order_picked = True
+
+Reservation Timeout
+At a schedule time EVERY 1 day at 12am +GMT-8
+FIND Expired_Reservation( Orders Grid: WHERE status is any of Reserved, Picking AND updated_at is number of days ago 2
+REPEAT for each in List of records in Expired_Reservation
+UPDATE Orders status=Expired
+CREATE Exceptions
+
+Exception Resolution
+When a record is created in Exceptions
+IF error_type is Validation Error
+UPDATE Exceptions assigned_to=Ops Team, status=Open
+SEND Email
+CREATE Notifications
+CREATE AuditLogs
+ELSE IF severity is Critical
+SEND Email
+CREATE Notifications
+CREATE AuditLogs
+
+Picklist Started
+When a record matches conditions Picklists WHERE status=In Progress
+FIND Orders WHERE Picklists = picklist_id
+UPDATE Orders status=Picking
+
+Order Cancellation
+When a record enter view Cancellaed_Orders(Order_Items Grid WHERE order_status=Cancelled, Expired, order_cancelled=False)
+UPDATE Order_Items order_cancelled=True
+CREATE AuditLogs
+
+Backorder Fulfillment Check
+When a record is updated Stock WHERE stock_percentage
+IF stock_percentage > 50
+FIND Backorders WHERE status=Pending AND Backorders.link_sku=Stock.sku
+SEND Email
+UPDATE Backorders status=Fulfilled
+CREATE Notifications
+CREATE AuditLogs
+
+Transfer Completion Handler
+When a record matches conditions Stock_Transfer WHERE status=Completed
+SEND email
+CREATE Notifications
+CREATE AuditLogs
+
+Failed Order Cleanup
+At a schedule 2weeks on Sunday 9am
+FIND Orders WHERE status=Failed, created_at is number of days ago: 7
+FIND Order_Items WHERE Orders is exactly Orders.order.id
+CREATE AuditLogs
+REPEAT for each Order_Items
+UPDATE order_cancelled=True
+
+Ready Order Reminder
+At a schedule 2 days at 11am
+FIND Orders WHERE status=Ready AND updated_at is number of days ago 2
+SEND Email
+CREATE Notifications
+CREATE AuditLogs
+Exception Auto Assignment
+When a record is created Exceptions
+IF error_type=Stock Shortage, Stock Unavailable
+UPDATE Exceptions assigned_to=Stock Team
+CREATE AuditLogs
+ELSE IF error_type=Validation Error, Partial Stock, System Error
+UPDATE Exceptions assigned_to=Ops Team
+CREATE AuditLogs
+
+Shipped Order Notification
+When a record matches conditions Orders WHERE status=Shipped
+SEND Email
+CREATE Notifications
+CREATE AuditLogs
+
+Stock Transfer Validator
+When a record is created Stock_Transfer
+IF from_location=to_location AND from_rack=to_rack
+UPDATE Stock_Transfer status=Failed
+CREATE Exceptions
+CREATE AuditLogs
+ELSE IF quantity < 1
+UPDATE Stock_Transfer status=Failed
+CREATE Exceptions
+CREATE AuditLogs

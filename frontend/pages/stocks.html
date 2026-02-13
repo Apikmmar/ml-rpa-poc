@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stocks - RPA</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="orders.html">Orders</a>
+        <a href="picklists.html">Picklists</a>
+        <a href="stocks.html" class="active">Stocks</a>
+        <a href="transfers.html">Transfers</a>
+        <a href="reports.html">Reports</a>
+        <a href="monitoring.html">Monitoring</a>
+    </nav>
+
+    <div class="container">
+        <h1>Stocks Management</h1>
+
+        <div class="card">
+            <h2>All Stocks</h2>
+            <button onclick="listStocks()">Refresh Stocks</button>
+            <div id="stocksResult" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h2>Goods Receipt</h2>
+            <input type="text" id="goodsSku" placeholder="SKU">
+            <input type="number" id="goodsQty" placeholder="Quantity" min="1">
+            <input type="text" id="goodsLocation" placeholder="Location">
+            <input type="text" id="goodsRack" placeholder="Rack">
+            <input type="text" id="receivedBy" placeholder="Received By" value="System">
+            <button onclick="receiveGoods()">Receive Goods</button>
+            <div id="goodsResult" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h2>Goods Receipts History</h2>
+            <button onclick="listGoodsReceipts()">Load Receipts</button>
+            <div id="receiptsResult" class="result"></div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/stocks.js"></script>
+</body>
+</html>

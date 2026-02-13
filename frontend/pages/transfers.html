@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transfers - RPA</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="orders.html">Orders</a>
+        <a href="picklists.html">Picklists</a>
+        <a href="stocks.html">Stocks</a>
+        <a href="transfers.html" class="active">Transfers</a>
+        <a href="reports.html">Reports</a>
+        <a href="monitoring.html">Monitoring</a>
+    </nav>
+
+    <div class="container">
+        <h1>Stock Transfers</h1>
+
+        <div class="card">
+            <h2>Create Stock Transfer</h2>
+            <input type="text" id="fromLocation" placeholder="From Location (Zone-A)">
+            <input type="text" id="toLocation" placeholder="To Location (Zone-B)">
+            <input type="text" id="fromRack" placeholder="From Rack (Rack-1)">
+            <input type="text" id="toRack" placeholder="To Rack (Rack-2)">
+            <input type="text" id="transferSku" placeholder="SKU (item_123)">
+            <input type="number" id="transferQty" placeholder="Quantity" min="1">
+            <input type="text" id="requestedBy" placeholder="Requested By">
+            <button onclick="createTransfer()">Create Transfer</button>
+            <div id="transferResult" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h2>All Transfers</h2>
+            <button onclick="listTransfers()">Load Transfers</button>
+            <div id="transfersResult" class="result"></div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/transfers.js"></script>
+</body>
+</html>

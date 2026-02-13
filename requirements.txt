@@ -1,0 +1,9 @@
+aws-cdk-lib==2.232.1
+constructs>=10.0.0,<11.0.0
+pyairtable
+
+# Airtable SDK for Python
+fastapi
+uvicorn
+httpx
+python-dotenv
