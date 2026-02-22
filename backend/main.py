@@ -18,11 +18,18 @@ app.include_router(monitoring.router)
 
 @app.get("/api")
 def root():
-    return {"message": "RPA Automation API", "version": "1.0"}
+    return {
+        "message": "RPA Automation API", 
+        "version": "1.0"
+    }
 
 @app.get("/api/config")
 def get_config():
-    return {"base_id": AIRTABLE_BASE_ID, "token_set": "Yes" if AIRTABLE_TOKEN != "your_token" else "No", "base_url": BASE_URL}
+    return {
+        "base_id": AIRTABLE_BASE_ID, 
+        "token_set": "Yes" if AIRTABLE_TOKEN != "your_token" else "No", 
+        "base_url": BASE_URL
+    }
 
 # Serve frontend static files
 frontend_path = os.path.join(os.path.dirname(__file__), "..", "frontend")

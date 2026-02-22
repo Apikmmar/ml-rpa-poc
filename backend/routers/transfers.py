@@ -13,7 +13,10 @@ async def create_stock_transfer(from_location: str, to_location: str, from_rack:
         resp = await client.post(f"{BASE_URL}/Stock_Transfers", headers=HEADERS, json=payload)
         if resp.status_code != 200:
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
-        return {"transfer_id": resp.json()["id"], "automation": "Transfer Approval triggered"}
+        return {
+            "transfer_id": resp.json()["id"], 
+            "automation": "Transfer Approval triggered"
+        }
 
 @router.get("")
 async def list_stock_transfers():

@@ -21,7 +21,15 @@ async def get_stock(stock_id: str):
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
         data = resp.json()
         f = data.get("fields", {})
-        return {"stock_id": stock_id, "sku": f.get("sku"), "available": f.get("available", 0), "quantity": f.get("quantity", 0), "reserved": f.get("reserved", 0), "location": f.get("location"), "rack": f.get("rack")}
+        return {
+            "stock_id": stock_id, 
+            "sku": f.get("sku"), 
+            "available": f.get("available", 0), 
+            "quantity": f.get("quantity", 0), 
+            "reserved": f.get("reserved", 0), 
+            "location": f.get("location"), 
+            "rack": f.get("rack")
+        }
 
 @router.post("/goods-receipt")
 async def receive_goods(sku: str, quantity: int, location: str, rack: str, received_by: str = "System"):
@@ -42,7 +50,13 @@ async def receive_goods(sku: str, quantity: int, location: str, rack: str, recei
             stock_payload = {"fields": {"add_stock": current_add + quantity, "updated_at": now, "updated_by": received_by}}
             await client.patch(f"{BASE_URL}/Stocks/{stock_id}", headers=HEADERS, json=stock_payload)
             
-            return {"receipt_id": receipt_resp.json().get("id"), "status": "received", "sku": sku, "quantity": quantity, "location": location, "rack": rack}
+            return {
+                "receipt_id": receipt_resp.json().get("id"), 
+                "status": "received", "sku": sku, 
+                "quantity": quantity, 
+                "location": location, 
+                "rack": rack
+            }
     raise HTTPException(404, "SKU not found")
 
 @router.get("/goods-receipts")

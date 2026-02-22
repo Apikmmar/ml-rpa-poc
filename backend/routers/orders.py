@@ -13,7 +13,6 @@ async def patch_airtable(client: httpx.AsyncClient, url: str, payload: dict):
     resp.raise_for_status()
     return resp
 
-
 @router.post("")
 async def create_order(order: CreateOrderRequest):
     async with httpx.AsyncClient() as client:
@@ -33,7 +32,10 @@ async def create_order(order: CreateOrderRequest):
                 item_payload = {"fields": {"order_id": [order_id], "sku": [stock_id], "qty": item.qty, "created_at": now, "created_by": "System", "updated_at": now, "updated_by": "System"}}
                 await client.post(f"{BASE_URL}/Order_Items", headers=HEADERS, json=item_payload)
         
-        return {"order_id": order_id, "automation": "Order Validator triggered"}
+        return {
+            "order_id": order_id, 
+            "automation": "Order Validator triggered"
+        }
 
 @router.get("")
 async def list_orders():
@@ -61,7 +63,11 @@ async def update_order_status(order_id: str, req: UpdateStatusRequest):
         resp = await client.patch(f"{BASE_URL}/Orders/{order_id}", headers=HEADERS, json={"fields": fields})
         if resp.status_code != 200:
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
-        return {"order_id": order_id, "status": req.status, "eta": req.eta}
+        return {
+            "order_id": order_id, 
+            "status": req.status, 
+            "eta": req.eta
+        }
 
 @router.post("/{order_id}/reserve")
 async def reserve_stock(order_id: str):
@@ -98,4 +104,9 @@ async def reserve_stock(order_id: str):
         except Exception:
             raise HTTPException(503, "Failed to update order status after 3 retries")
 
-        return {"order_id": order_id, "reserved": reserved, "shortages": shortages, "status": status}
+        return {
+            "order_id": order_id, 
+            "reserved": reserved, 
+            "shortages": shortages, 
+            "status": status
+        }

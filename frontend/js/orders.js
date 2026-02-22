@@ -124,16 +124,19 @@ async function listOrders() {
 async function updateOrderStatus() {
     const orderId = document.getElementById('updateOrderId').value;
     const status = document.getElementById('updateStatus').value;
+    const eta = document.getElementById('updateEta').value;
 
     const resultDiv = document.getElementById('updateOrderResult');
     resultDiv.style.display = 'block';
     resultDiv.textContent = 'Updating status...';
 
     try {
+        const body = { status };
+        if (eta) body.eta = eta;
         const result = await fetch(`${API_URL}/orders/${orderId}/status`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status })
+            body: JSON.stringify(body)
         });
         const json = await result.json();
         resultDiv.textContent = JSON.stringify(json, null, 2);

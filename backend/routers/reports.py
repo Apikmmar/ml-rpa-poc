@@ -19,7 +19,11 @@ async def stock_reconciliation():
         stocks = resp.json()["records"]
         report = [{"sku": s["fields"]["sku"], "quantity": s["fields"].get("quantity", 0), "available": s["fields"].get("available", 0), "reserved": s["fields"].get("reserved", 0)} for s in stocks]
         report_id = await _save_report(client, "Stock Reconciliation", report)
-        return {"report_id": report_id, "report": report, "total_items": len(report)}
+        return {
+            "report_id": report_id, 
+            "report": report, 
+            "total_items": len(report)
+        }
 
 @router.post("/daily")
 async def daily_summary():
@@ -30,7 +34,10 @@ async def daily_summary():
         statuses = [o["fields"].get("status", "") for o in orders]
         report = {"date": datetime.utcnow().date().isoformat(), "total_orders": len(orders), "by_status": {s: statuses.count(s) for s in set(statuses)}}
         report_id = await _save_report(client, "Daily Summary", report)
-        return {"report_id": report_id, "report": report}
+        return {
+            "report_id": report_id, 
+            "report": report
+        }
 
 @router.post("/weekly")
 async def weekly_summary():
@@ -43,7 +50,10 @@ async def weekly_summary():
         statuses = [o["fields"].get("status", "") for o in orders]
         report = {"week_ending": datetime.utcnow().date().isoformat(), "total_orders": len(orders), "by_status": {s: statuses.count(s) for s in set(statuses)}, "total_skus": len(stocks), "low_stock": [s["fields"]["sku"] for s in stocks if s["fields"].get("avb_qty", 0) < 10]}
         report_id = await _save_report(client, "Weekly Summary", report)
-        return {"report_id": report_id, "report": report}
+        return {
+            "report_id": report_id, 
+            "report": report
+        }
 
 @router.get("")
 async def list_reports():

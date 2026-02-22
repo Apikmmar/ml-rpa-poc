@@ -21,7 +21,10 @@ async def create_exception(related_id: str, error_type: str, error_message: str,
         resp = await client.post(f"{BASE_URL}/Exceptions", headers=HEADERS, json=payload)
         if resp.status_code != 200:
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
-        return {"exception_id": resp.json()["id"], "action_taken": "Exception created, automation triggered"}
+        return {
+            "exception_id": resp.json()["id"], 
+            "action_taken": "Exception created, automation triggered"
+        }
 
 @router.get("/audit-logs")
 async def list_audit_logs():

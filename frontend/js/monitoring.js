@@ -140,12 +140,12 @@ async function getMetrics() {
                     <p style="font-size: 2em; font-weight: bold;">${json.total_audit_logs}</p>
                 </div>
                 <div class="metric-card">
-                    <h3>Avg Processing Time</h3>
-                    <p style="font-size: 2em; font-weight: bold;">${json.avg_processing_time}s</p>
-                </div>
-                <div class="metric-card">
                     <h3>Success Rate</h3>
                     <p style="font-size: 2em; font-weight: bold;">${json.success_rate}%</p>
+                </div>
+                <div class="metric-card">
+                    <h3>Orders by Status</h3>
+                    <p style="font-size: 0.9em;">${JSON.stringify(json.orders_by_status, null, 2)}</p>
                 </div>
             </div>
         `;

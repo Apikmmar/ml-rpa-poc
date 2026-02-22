@@ -1,4 +1,30 @@
-async function generateReconciliation() {
+async function generateDailySummary() {
+    const resultDiv = document.getElementById('dailyResult');
+    resultDiv.style.display = 'block';
+    resultDiv.textContent = 'Generating daily summary...';
+    try {
+        const result = await fetch(`${API_URL}/reports/daily`, { method: 'POST' });
+        const json = await result.json();
+        resultDiv.textContent = JSON.stringify(json, null, 2);
+    } catch (error) {
+        resultDiv.textContent = 'Error: ' + error.message;
+    }
+}
+
+async function generateWeeklySummary() {
+    const resultDiv = document.getElementById('weeklyResult');
+    resultDiv.style.display = 'block';
+    resultDiv.textContent = 'Generating weekly summary...';
+    try {
+        const result = await fetch(`${API_URL}/reports/weekly`, { method: 'POST' });
+        const json = await result.json();
+        resultDiv.textContent = JSON.stringify(json, null, 2);
+    } catch (error) {
+        resultDiv.textContent = 'Error: ' + error.message;
+    }
+}
+
+
     const resultDiv = document.getElementById('reconciliationResult');
     resultDiv.style.display = 'block';
     resultDiv.textContent = 'Generating reconciliation report...';
