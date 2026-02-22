@@ -40,10 +40,17 @@ def lambda_handler(event, context: LambdaContext):
                         'priority': priority,
                         'items': items
                     }
-                    resp = client.post(f"{FASTAPI_URL}/orders", json=payload)
-                    results.append({'order': customer_id, 'status': resp.status_code, 'response': resp.json()})
+                    resp = client.post(f"{FASTAPI_URL}/orders", json=payload, follow_redirects=False)
+                    results.append({'order': customer_id, 'status': resp.status_code, 'response': resp.json() if resp.headers.get('content-type', '').startswith('application/json') else resp.text})
 
-        return {'status': True, 'results': results}
+            processed_key = key.replace('orders/', 'processed/', 1)
+            s3.copy_object(Bucket=bucket, CopySource={'Bucket': bucket, 'Key': key}, Key=processed_key)
+            s3.delete_object(Bucket=bucket, Key=key)
+
+        return {
+            'status': True, 
+            'results': results
+        }
 
     except Exception as e:
         tracer.put_annotation("lambda_error", "true")

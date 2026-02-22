@@ -14,6 +14,7 @@ async def patch_airtable(client: httpx.AsyncClient, url: str, payload: dict):
     return resp
 
 
+@router.post("")
 async def create_order(order: CreateOrderRequest):
     async with httpx.AsyncClient() as client:
         now = datetime.utcnow().isoformat()

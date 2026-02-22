@@ -7,6 +7,7 @@ from aws_cdk import (
     aws_lambda_event_sources as lambda_events,
     aws_events as events,
     aws_events_targets as targets,
+    aws_s3 as s3,
 )
 from constructs import Construct
 from .config import PREFIX
@@ -65,15 +66,15 @@ class LambdaStack(Construct):
             environment={
                 "TABLE_PREFIX": PREFIX,
                 "S3_BUCKET_NAME": bucket.bucket_name,
-                "FASTAPI_URL": "http://localhost:8000"  # update to deployed URL
+                "FASTAPI_URL": "https://kimberly-unchristian-leo.ngrok-free.dev"
             }
         )
 
-        bucket.grant_read(csv_lambda)
+        bucket.grant_read_write(csv_lambda)
         csv_lambda.add_event_source(lambda_events.S3EventSource(
             bucket,
-            events=[lambda_.EventType.OBJECT_CREATED],
-            filters=[lambda_.NotificationKeyFilter(prefix="orders/", suffix=".csv")]
+            events=[s3.EventType.OBJECT_CREATED],
+            filters=[s3.NotificationKeyFilter(prefix="orders/", suffix=".csv")]
         ))
 
         # Grant DynamoDB read/write to all synced tables
