@@ -79,6 +79,8 @@ Stock_Transfers
 Link to Stock_Transfers
 Notifications
 Link to Notifications
+Good_Receipts
+Link to Good_Receipts
 
 
 Order_Items
@@ -154,8 +156,8 @@ updated_at
 Date ISO
 updated_by
 System
-order_id
-Link to Orders
+general_id
+Single line text
 step
 Single line text
 status
@@ -240,7 +242,7 @@ Link to Orders
 stock_id
 Link to Stocks
 customer_email
-Lookup(order_id -> custom_order_id)
+Lookup(order_id -> customer_email)
 type
 Single select(Email)
 recipient
@@ -267,11 +269,65 @@ Long text
 status
 Single select(Pending, Fulfilled, Cancelled)
 link_sku
-Link to Stock
+Link to Stock(multiple)
 sku
 Lookup(link_sku -> sku)
 qty_needed
 Number
+
+
+Good_Receipts
+Data
+Data Type
+receipt_id
+RECORD_ID()
+created_at
+Date ISO
+created_by
+System
+updated_at
+Date ISO
+updated_by
+System
+sku
+Lookup(link_sku -> sku)
+link_sku
+Link to Stock
+quantity
+Number
+location
+Single line text
+rack
+Single line text
+received_by
+Single line text
+status
+Single select(Pending, Completed, Failed)
+notes
+Long text
+
+
+Reports
+Data
+Data Type
+report_id
+RECORD_ID()
+created_at
+Date ISO
+created_by
+System
+updated_at
+Date ISO
+updated_by
+System
+report_type
+Single select(Stock Reconciliation, Daily Summary, Weekly Summary)
+report_data
+Long text
+generated_by
+Single line text
+status
+Single select(Generated, Archived)
 
 
 
@@ -294,7 +350,7 @@ CREATE AuditLogs
 ELSE
 UPDATE Orders status=Failed
 CREATE Backorders
-SEND Email
+SEND Gmail
 CREATE Notifications
 CREATE Exceptions
 CREATE AuditLogs
@@ -303,21 +359,20 @@ Picklist Generator
 When a record matches conditions Orders WHERE status is Stock Confirmed
 CREATE Picklists
 UPDATE Orders status=Reserved, Picklists=Picklist.picklis_id, Order.customer_email
-CREATE AuditLogs
-SEND Email
+SEND Gmail
 CREATE Notifications
-CREATE AuditLogs Notification
+CREATE AuditLogs
 
 High Priority Alert
 When a record is created in Picklists
 IF priority has any of High OR Urgent
-SEND Email
+SEND Gmail
 CREATE Notifications
 CREATE AuditLogs
 Exception Alert
 When a record is created in Exceptions
 IF severity has any of High OR Critical
-SEND Email
+SEND Gmail
 UPDATE Exception assigned_to=Ops Team, status=Open
 CREATE Notification
 CREATE AuditLogs
@@ -325,7 +380,7 @@ CREATE AuditLogs
 Low Stock Alert
 When a record enters a view Stocks
 IF stock_percentave <=50
-SEND Email
+SEND Gmail
 CREATE Notifications
 CREATE Exceptions
 
@@ -334,9 +389,9 @@ When a record is created in Stock_Transfers
 IF quantity <= 30
 UPDATE Stock_Transfers status=Completed
 CREATE AuditLogs
-ELIF quantity >
+ELIF quantity > 30
 UPDATE Stock_Transfers status=Pending
-SEND Email
+SEND Gmail
 CREATE Notifications
 CREATE AuditLogs
 
@@ -344,7 +399,7 @@ Picklist Completer
 When a record matches conditions Picklists WHERE status is Completed
 Find Orders WHERE Picklists contains picklist_id
 UPDATE Orders status=Ready
-SEND Email
+SEND Gmail
 CREATE Notifications
 CREATE AuditLogs
 FIND Order_Items WHERE Order_Items.order_id = Orders.order_id
@@ -361,11 +416,11 @@ Exception Resolution
 When a record is created in Exceptions
 IF error_type is Validation Error
 UPDATE Exceptions assigned_to=Ops Team, status=Open
-SEND Email
+SEND Gmail
 CREATE Notifications
 CREATE AuditLogs
 ELSE IF severity is Critical
-SEND Email
+SEND Gmail
 CREATE Notifications
 CREATE AuditLogs
 
@@ -383,14 +438,14 @@ Backorder Fulfillment Check
 When a record is updated Stock WHERE stock_percentage
 IF stock_percentage > 50
 FIND Backorders WHERE status=Pending AND Backorders.link_sku=Stock.sku
-SEND Email
+SEND Gmail
 UPDATE Backorders status=Fulfilled
 CREATE Notifications
 CREATE AuditLogs
 
 Transfer Completion Handler
 When a record matches conditions Stock_Transfer WHERE status=Completed
-SEND email
+SEND Gmail
 CREATE Notifications
 CREATE AuditLogs
 
@@ -405,7 +460,7 @@ UPDATE order_cancelled=True
 Ready Order Reminder
 At a schedule 2 days at 11am
 FIND Orders WHERE status=Ready AND updated_at is number of days ago 2
-SEND Email
+SEND Gmail
 CREATE Notifications
 CREATE AuditLogs
 Exception Auto Assignment
@@ -419,7 +474,7 @@ CREATE AuditLogs
 
 Shipped Order Notification
 When a record matches conditions Orders WHERE status=Shipped
-SEND Email
+SEND Gmail
 CREATE Notifications
 CREATE AuditLogs
 

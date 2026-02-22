@@ -1,12 +1,19 @@
 from fastapi import APIRouter, HTTPException
 import httpx
 from datetime import datetime
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from config import BASE_URL, HEADERS
 from models.schemas import CreateOrderRequest, UpdateStatusRequest
 
 router = APIRouter(prefix="/orders", tags=["orders"])
 
-@router.post("")
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=4), retry=retry_if_exception_type(httpx.HTTPStatusError))
+async def patch_airtable(client: httpx.AsyncClient, url: str, payload: dict):
+    resp = await client.patch(url, headers=HEADERS, json=payload)
+    resp.raise_for_status()
+    return resp
+
+
 async def create_order(order: CreateOrderRequest):
     async with httpx.AsyncClient() as client:
         now = datetime.utcnow().isoformat()
@@ -51,3 +58,40 @@ async def update_order_status(order_id: str, req: UpdateStatusRequest):
         if resp.status_code != 200:
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
         return {"order_id": order_id, "status": req.status}
+
+@router.post("/{order_id}/reserve")
+async def reserve_stock(order_id: str):
+    async with httpx.AsyncClient() as client:
+        now = datetime.utcnow().isoformat()
+
+        items_resp = await client.get(f"{BASE_URL}/Order_Items?filterByFormula={{order_id}}='{order_id}'", headers=HEADERS)
+        items = items_resp.json().get("records", [])
+        if not items:
+            raise HTTPException(404, "No order items found")
+
+        reserved, shortages = [], []
+        for item in items:
+            f = item["fields"]
+            qty_needed = f.get("qty", 0)
+            avb_qty = f.get("avb_qty", 0)
+            sku = f.get("item_sku") or f.get("lookup_sku", "")
+
+            if avb_qty >= qty_needed:
+                reserved.append({"sku": sku, "qty": qty_needed})
+            else:
+                if avb_qty > 0:
+                    reserved.append({"sku": sku, "qty": avb_qty})
+                shortages.append({"sku": sku, "qty_needed": qty_needed, "qty_available": avb_qty})
+
+        if shortages:
+            for shortage in shortages:
+                backorder_payload = {"fields": {"original_order_id": [order_id], "items": str(shortage), "status": "Pending", "qty_needed": shortage["qty_needed"], "created_at": now, "created_by": "System", "updated_at": now, "updated_by": "System"}}
+                await client.post(f"{BASE_URL}/Backorders", headers=HEADERS, json=backorder_payload)
+
+        status = "Reserved" if not shortages else ("Failed" if not reserved else "Reserved")
+        try:
+            await patch_airtable(client, f"{BASE_URL}/Orders/{order_id}", {"fields": {"status": status, "updated_at": now, "updated_by": "System"}})
+        except Exception:
+            raise HTTPException(503, "Failed to update order status after 3 retries")
+
+        return {"order_id": order_id, "reserved": reserved, "shortages": shortages, "status": status}
