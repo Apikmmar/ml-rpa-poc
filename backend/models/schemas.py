@@ -13,3 +13,4 @@ class CreateOrderRequest(BaseModel):
 
 class UpdateStatusRequest(BaseModel):
     status: str
+    eta: str | None = None

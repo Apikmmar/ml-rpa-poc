@@ -26,6 +26,8 @@ stock_validation
 Formula[ IF(all_item_avb = TRUE(), "Passed", "Failed") ]
 all_item_avb
 Rollup(Order_Items -> stock_sufficient)[ARRAYUNIQUE(values)]
+eta
+Date ISO
 Order_Items
 Link to Order_Items
 Picklists

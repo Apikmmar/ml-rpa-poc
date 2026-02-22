@@ -54,11 +54,14 @@ async def get_order(order_id: str):
 @router.patch("/{order_id}/status")
 async def update_order_status(order_id: str, req: UpdateStatusRequest):
     async with httpx.AsyncClient() as client:
-        payload = {"fields": {"status": req.status}}
-        resp = await client.patch(f"{BASE_URL}/Orders/{order_id}", headers=HEADERS, json=payload)
+        now = datetime.utcnow().isoformat()
+        fields = {"status": req.status, "updated_at": now, "updated_by": "System"}
+        if req.eta:
+            fields["eta"] = req.eta
+        resp = await client.patch(f"{BASE_URL}/Orders/{order_id}", headers=HEADERS, json={"fields": fields})
         if resp.status_code != 200:
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
-        return {"order_id": order_id, "status": req.status}
+        return {"order_id": order_id, "status": req.status, "eta": req.eta}
 
 @router.post("/{order_id}/reserve")
 async def reserve_stock(order_id: str):

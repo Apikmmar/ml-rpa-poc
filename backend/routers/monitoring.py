@@ -48,6 +48,19 @@ async def list_notifications():
 @router.get("/metrics/dashboard")
 async def get_metrics():
     async with httpx.AsyncClient() as client:
-        orders = await client.get(f"{BASE_URL}/Orders", headers=HEADERS)
-        logs = await client.get(f"{BASE_URL}/AuditLogs", headers=HEADERS)
-        return {"total_orders": len(orders.json()["records"]), "total_audit_logs": len(logs.json()["records"]), "avg_processing_time": 45, "success_rate": 98.5}
+        orders_resp = await client.get(f"{BASE_URL}/Orders", headers=HEADERS)
+        logs_resp = await client.get(f"{BASE_URL}/AuditLogs", headers=HEADERS)
+
+    orders = orders_resp.json().get("records", [])
+    logs = logs_resp.json().get("records", [])
+
+    statuses = [r["fields"].get("status", "") for r in orders]
+    total = len(orders)
+    success = sum(1 for s in statuses if s in ("Reserved", "Completed", "Shipped"))
+
+    return {
+        "total_orders": total,
+        "total_audit_logs": len(logs),
+        "success_rate": round(success / total * 100, 1) if total else 0,
+        "orders_by_status": {s: statuses.count(s) for s in set(statuses)}
+    }
