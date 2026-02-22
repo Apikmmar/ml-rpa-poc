@@ -1,1 +1,1 @@
-const API_URL = window.location.origin;
+const API_URL = 'https://ml-rpa-poc.onrender.com';
