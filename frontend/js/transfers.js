@@ -22,13 +22,14 @@ async function createTransfer() {
     }
 }
 
-async function listTransfers() {
+async function listTransfers(forceRefresh = false) {
     const resultDiv = document.getElementById('transfersResult');
     resultDiv.style.display = 'block';
     resultDiv.textContent = 'Loading transfers...';
 
     try {
-        const result = await fetch(`${API_URL}/stock-transfers`);
+        const url = forceRefresh ? `${API_URL}/stock-transfers?refresh=true` : `${API_URL}/stock-transfers`;
+        const result = await fetch(url);
         const json = await result.json();
         
         if (json.records && json.records.length > 0) {
@@ -54,3 +55,7 @@ async function listTransfers() {
         resultDiv.textContent = 'Error: ' + error.message;
     }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('transfersResult')) listTransfers();
+});

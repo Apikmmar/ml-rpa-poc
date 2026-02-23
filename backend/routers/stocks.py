@@ -1,17 +1,33 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 import httpx
 from datetime import datetime
 from config import BASE_URL, HEADERS
 
 router = APIRouter(prefix="/stocks", tags=["stocks"])
 
-@router.get("")
-async def list_stocks():
+_stocks_cache = {"data": None, "cached_at": None}
+CACHE_TTL = 86400
+
+async def _fetch_stocks():
     async with httpx.AsyncClient() as client:
         resp = await client.get(f"{BASE_URL}/Stocks", headers=HEADERS)
         if resp.status_code != 200:
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
-        return resp.json()
+        _stocks_cache["data"] = resp.json()
+        _stocks_cache["cached_at"] = datetime.utcnow().timestamp()
+        return _stocks_cache["data"]
+
+@router.get("")
+async def list_stocks(refresh: bool = Query(False)):
+    now_ts = datetime.utcnow().timestamp()
+    cache_stale = (
+        _stocks_cache["data"] is None or
+        _stocks_cache["cached_at"] is None or
+        (now_ts - _stocks_cache["cached_at"]) > CACHE_TTL
+    )
+    if refresh or cache_stale:
+        return await _fetch_stocks()
+    return _stocks_cache["data"]
 
 @router.get("/{stock_id}")
 async def get_stock(stock_id: str):

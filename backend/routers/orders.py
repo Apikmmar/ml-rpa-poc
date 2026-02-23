@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 import httpx
 from datetime import datetime
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
@@ -6,6 +6,18 @@ from config import BASE_URL, HEADERS
 from models.schemas import CreateOrderRequest, UpdateStatusRequest
 
 router = APIRouter(prefix="/orders", tags=["orders"])
+
+_orders_cache = {"data": None, "cached_at": None}
+CACHE_TTL = 86400
+
+async def _fetch_orders():
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(f"{BASE_URL}/Orders", headers=HEADERS)
+        if resp.status_code != 200:
+            raise HTTPException(status_code=resp.status_code, detail=resp.text)
+        _orders_cache["data"] = resp.json()
+        _orders_cache["cached_at"] = datetime.utcnow().timestamp()
+        return _orders_cache["data"]
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=4), retry=retry_if_exception_type(httpx.HTTPStatusError))
 async def patch_airtable(client: httpx.AsyncClient, url: str, payload: dict):
@@ -33,7 +45,7 @@ async def create_order(order: CreateOrderRequest):
         if resp.status_code != 200:
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
         
-        order_id = resp.json()["order_id"]
+        order_id = resp.json()["id"]
         
         for item in order.items:
             stocks = await client.get(f"{BASE_URL}/Stocks?filterByFormula={{sku}}='{item.sku}'", headers=HEADERS)
@@ -53,18 +65,23 @@ async def create_order(order: CreateOrderRequest):
                     }
                 await client.post(f"{BASE_URL}/Order_Items", headers=HEADERS, json=item_payload)
         
+        _orders_cache["data"] = None  # invalidate cache
         return {
             "order_id": order_id, 
             "automation": "Order Validator triggered"
         }
 
 @router.get("")
-async def list_orders():
-    async with httpx.AsyncClient() as client:
-        resp = await client.get(f"{BASE_URL}/Orders", headers=HEADERS)
-        if resp.status_code != 200:
-            raise HTTPException(status_code=resp.status_code, detail=resp.text)
-        return resp.json()
+async def list_orders(refresh: bool = Query(False)):
+    now_ts = datetime.utcnow().timestamp()
+    cache_stale = (
+        _orders_cache["data"] is None or
+        _orders_cache["cached_at"] is None or
+        (now_ts - _orders_cache["cached_at"]) > CACHE_TTL
+    )
+    if refresh or cache_stale:
+        return await _fetch_orders()
+    return _orders_cache["data"]
 
 @router.get("/{order_id}")
 async def get_order(order_id: str):

@@ -2,6 +2,7 @@ const NAV_LINKS = [
     { href: '/index',                        label: 'Dashboard',            icon: 'bi-speedometer2' },
     { group: 'Orders' },
     { href: '/orders',                       label: 'Create Order',         icon: 'bi-plus-circle' },
+    { href: '/upload',                       label: 'Upload Orders',           icon: 'bi-cloud-upload' },
     { href: '/orders/list',                  label: 'All Orders',           icon: 'bi-bag' },
     { href: '/orders/update',                label: 'Update Status',        icon: 'bi-pencil' },
     { group: 'Stocks' },
@@ -27,8 +28,6 @@ const NAV_LINKS = [
     { href: '/monitoring/audit',             label: 'Audit Logs',           icon: 'bi-journal-text' },
     { href: '/monitoring/backorders',        label: 'Backorders',           icon: 'bi-hourglass-split' },
     { href: '/monitoring/notifications',     label: 'Notifications',        icon: 'bi-bell' },
-    { group: 'Upload' },
-    { href: '/upload',                       label: 'Upload CSV',           icon: 'bi-cloud-upload' },
 ];
 
 const parts = location.pathname.replace('.html', '').split('/').filter(Boolean);

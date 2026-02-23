@@ -1,17 +1,34 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 import httpx
+from datetime import datetime
 from config import BASE_URL, HEADERS
 from models.schemas import UpdateStatusRequest
 
 router = APIRouter(prefix="/picklists", tags=["picklists"])
 
-@router.get("")
-async def list_picklists():
+_picklists_cache = {"data": None, "cached_at": None}
+CACHE_TTL = 86400
+
+async def _fetch_picklists():
     async with httpx.AsyncClient() as client:
         resp = await client.get(f"{BASE_URL}/Picklists", headers=HEADERS)
         if resp.status_code != 200:
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
-        return resp.json()
+        _picklists_cache["data"] = resp.json()
+        _picklists_cache["cached_at"] = datetime.utcnow().timestamp()
+        return _picklists_cache["data"]
+
+@router.get("")
+async def list_picklists(refresh: bool = Query(False)):
+    now_ts = datetime.utcnow().timestamp()
+    cache_stale = (
+        _picklists_cache["data"] is None or
+        _picklists_cache["cached_at"] is None or
+        (now_ts - _picklists_cache["cached_at"]) > CACHE_TTL
+    )
+    if refresh or cache_stale:
+        return await _fetch_picklists()
+    return _picklists_cache["data"]
 
 @router.patch("/{picklist_id}/status")
 async def update_picklist_status(picklist_id: str, req: UpdateStatusRequest):

@@ -54,13 +54,14 @@ async function generateReconciliation() {
     }
 }
 
-async function listReports() {
+async function listReports(forceRefresh = false) {
     const resultDiv = document.getElementById('reportsResult');
     resultDiv.style.display = 'block';
     resultDiv.textContent = 'Loading reports...';
 
     try {
-        const result = await fetch(`${API_URL}/reports`);
+        const url = forceRefresh ? `${API_URL}/reports?refresh=true` : `${API_URL}/reports`;
+        const result = await fetch(url);
         const json = await result.json();
         
         if (json.records && json.records.length > 0) {
@@ -83,3 +84,7 @@ async function listReports() {
         resultDiv.textContent = 'Error: ' + error.message;
     }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('reportsResult')) listReports();
+});

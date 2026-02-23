@@ -90,13 +90,14 @@ async function createOrder() {
     }
 }
 
-async function listOrders() {
+async function listOrders(forceRefresh = false) {
     const resultDiv = document.getElementById('ordersResult');
     resultDiv.style.display = 'block';
     resultDiv.textContent = 'Loading orders...';
 
     try {
-        const result = await fetch(`${API_URL}/orders`);
+        const url = forceRefresh ? `${API_URL}/orders?refresh=true` : `${API_URL}/orders`;
+        const result = await fetch(url);
         const json = await result.json();
         
         if (json.records && json.records.length > 0) {
@@ -120,6 +121,10 @@ async function listOrders() {
         resultDiv.textContent = 'Error: ' + error.message;
     }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('ordersResult')) listOrders();
+});
 
 async function updateOrderStatus() {
     const orderId = document.getElementById('updateOrderId').value;

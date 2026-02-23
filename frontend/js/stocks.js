@@ -1,10 +1,11 @@
-async function listStocks() {
+async function listStocks(forceRefresh = false) {
     const resultDiv = document.getElementById('stocksResult');
     resultDiv.style.display = 'block';
     resultDiv.textContent = 'Loading stocks...';
 
     try {
-        const result = await fetch(`${API_URL}/stocks`);
+        const url = forceRefresh ? `${API_URL}/stocks?refresh=true` : `${API_URL}/stocks`;
+        const result = await fetch(url);
         const json = await result.json();
         
         if (json.records && json.records.length > 0) {
@@ -29,6 +30,10 @@ async function listStocks() {
         resultDiv.textContent = 'Error: ' + error.message;
     }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('stocksResult')) listStocks();
+});
 
 async function receiveGoods() {
     const sku = document.getElementById('goodsSku').value;

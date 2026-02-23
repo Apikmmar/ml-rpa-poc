@@ -1,10 +1,22 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 import httpx
 import json
 from datetime import datetime, timedelta
 from config import BASE_URL, HEADERS
 
 router = APIRouter(prefix="/reports", tags=["reports"])
+
+_reports_cache = {"data": None, "cached_at": None}
+CACHE_TTL = 86400
+
+async def _fetch_reports():
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(f"{BASE_URL}/Reports", headers=HEADERS)
+        if resp.status_code != 200:
+            raise HTTPException(status_code=resp.status_code, detail=resp.text)
+        _reports_cache["data"] = resp.json()
+        _reports_cache["cached_at"] = datetime.utcnow().timestamp()
+        return _reports_cache["data"]
 
 async def _save_report(client, report_type, data):
     now = datetime.utcnow().isoformat()
@@ -78,9 +90,13 @@ async def weekly_summary():
         }
 
 @router.get("")
-async def list_reports():
-    async with httpx.AsyncClient() as client:
-        resp = await client.get(f"{BASE_URL}/Reports", headers=HEADERS)
-        if resp.status_code != 200:
-            raise HTTPException(status_code=resp.status_code, detail=resp.text)
-        return resp.json()
+async def list_reports(refresh: bool = Query(False)):
+    now_ts = datetime.utcnow().timestamp()
+    cache_stale = (
+        _reports_cache["data"] is None or
+        _reports_cache["cached_at"] is None or
+        (now_ts - _reports_cache["cached_at"]) > CACHE_TTL
+    )
+    if refresh or cache_stale:
+        return await _fetch_reports()
+    return _reports_cache["data"]

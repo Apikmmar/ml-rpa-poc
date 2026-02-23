@@ -1,10 +1,11 @@
-async function listPicklists() {
+async function listPicklists(forceRefresh = false) {
     const resultDiv = document.getElementById('picklistsResult');
     resultDiv.style.display = 'block';
     resultDiv.textContent = 'Loading picklists...';
 
     try {
-        const result = await fetch(`${API_URL}/picklists`);
+        const url = forceRefresh ? `${API_URL}/picklists?refresh=true` : `${API_URL}/picklists`;
+        const result = await fetch(url);
         const json = await result.json();
         
         if (json.records && json.records.length > 0) {
@@ -28,6 +29,10 @@ async function listPicklists() {
         resultDiv.textContent = 'Error: ' + error.message;
     }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('picklistsResult')) listPicklists();
+});
 
 async function updatePicklistStatus() {
     const picklistId = document.getElementById('picklistId').value;
