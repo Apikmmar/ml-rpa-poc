@@ -25,6 +25,7 @@ async function generateWeeklySummary() {
 }
 
 
+async function generateReconciliation() {
     const resultDiv = document.getElementById('reconciliationResult');
     resultDiv.style.display = 'block';
     resultDiv.textContent = 'Generating reconciliation report...';
