@@ -19,6 +19,8 @@ class DynamoDBStack(Construct):
             'Exceptions',
             'Notifications',
             'Backorders',
+            'GoodsReceipts',
+            'Reports',
             'SyncHistory',
         ]
         
@@ -37,3 +39,71 @@ class DynamoDBStack(Construct):
                 removal_policy=RemovalPolicy.DESTROY
             )
             self.tables[table] = ddb_table
+            
+            # if table == 'Orders':
+            #     ddb_table.add_global_secondary_index(
+            #         partition_key=dynamodb.Attribute(name='status', type=dynamodb.AttributeType.STRING),
+            #         index_name='-'.join(['gsi', 'status'])
+            #     )
+            
+            # if table == 'Stocks':
+            #     ddb_table.add_global_secondary_index(
+            #         partition_key=dynamodb.Attribute(name='status', type=dynamodb.AttributeType.STRING),
+            #         index_name='-'.join(['gsi', 'status'])
+            #     )
+            
+            # if table == 'Order_Items':
+            #     ddb_table.add_global_secondary_index(
+            #         partition_key=dynamodb.Attribute(name='status', type=dynamodb.AttributeType.STRING),
+            #         index_name='-'.join(['gsi', 'status'])
+            #     )
+            
+            # if table == 'Picklists':
+            #     ddb_table.add_global_secondary_index(
+            #         partition_key=dynamodb.Attribute(name='status', type=dynamodb.AttributeType.STRING),
+            #         index_name='-'.join(['gsi', 'status'])
+            #     )
+            
+            # if table == 'AuditLogs':
+            #     ddb_table.add_global_secondary_index(
+            #         partition_key=dynamodb.Attribute(name='status', type=dynamodb.AttributeType.STRING),
+            #         index_name='-'.join(['gsi', 'status'])
+            #     )
+            
+            # if table == 'Stock_Transfers':
+            #     ddb_table.add_global_secondary_index(
+            #         partition_key=dynamodb.Attribute(name='status', type=dynamodb.AttributeType.STRING),
+            #         index_name='-'.join(['gsi', 'status'])
+            #     )
+            
+            # if table == 'Exceptions':
+            #     ddb_table.add_global_secondary_index(
+            #         partition_key=dynamodb.Attribute(name='status', type=dynamodb.AttributeType.STRING),
+            #         index_name='-'.join(['gsi', 'status'])
+            #     )
+            
+            # if table == 'Notifications':
+            #     ddb_table.add_global_secondary_index(
+            #         partition_key=dynamodb.Attribute(name='status', type=dynamodb.AttributeType.STRING),
+            #         index_name='-'.join(['gsi', 'status'])
+            #     )
+            
+            # if table == 'Backorders':
+            #     ddb_table.add_global_secondary_index(
+            #         partition_key=dynamodb.Attribute(name='status', type=dynamodb.AttributeType.STRING),
+            #         index_name='-'.join(['gsi', 'status'])
+            #     )
+            
+            # if table == 'GoodsReceipts':
+            #     ddb_table.add_global_secondary_index(
+            #         partition_key=dynamodb.Attribute(name='status', type=dynamodb.AttributeType.STRING),
+            #         index_name='-'.join(['gsi', 'status'])
+            #     )
+            
+            # if table == 'Reports':
+            #     ddb_table.add_global_secondary_index(
+            #         partition_key=dynamodb.Attribute(name='status', type=dynamodb.AttributeType.STRING),
+            #         index_name='-'.join(['gsi', 'status'])
+            #     )
+            
+            
