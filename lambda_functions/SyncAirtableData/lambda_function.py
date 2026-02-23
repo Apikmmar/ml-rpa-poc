@@ -9,7 +9,7 @@ from aws_lambda_powertools.utilities.typing import LambdaContext
 
 dynamodb = boto3.resource('dynamodb')
 
-PREFIX = os.environ.get('TABLE_PREFIX', 'RPA-')
+PREFIX = os.environ.get('TABLE_PREFIX')
 
 HISTORY_TABLE_NAME = os.environ['HISTORY_TABLE_NAME']
 HISTORY_TABLE = dynamodb.Table(HISTORY_TABLE_NAME)

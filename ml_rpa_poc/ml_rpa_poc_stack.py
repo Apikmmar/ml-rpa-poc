@@ -7,6 +7,7 @@ from constructs import Construct
 
 from .dynamo_db_stack import DynamoDBStack
 from .lambda_function_stack import LambdaStack
+from .api_gateway_stack import ApiGatewayStack
 
 class MlRpaPocStack(Stack):
 
@@ -14,11 +15,18 @@ class MlRpaPocStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
         
         bucket = s3.Bucket(self, "MLBucket",
-            bucket_name="s3-ml-rpa-poc",
+            bucket_name="rpa-s3-ml-poc",
             removal_policy=RemovalPolicy.DESTROY,
             auto_delete_objects=True,
-            versioned=True
+            versioned=True,
+            cors=[s3.CorsRule(
+                allowed_methods=[s3.HttpMethods.PUT],
+                allowed_origins=["*"],
+                allowed_headers=["*"],
+                exposed_headers=["ETag"]
+            )]
         )
 
         dynamo_db_stack = DynamoDBStack(self, "DynamoDBStack")
-        LambdaStack(self, "LambdaStack", dynamo_db_stack=dynamo_db_stack, bucket=bucket)
+        lambda_stack = LambdaStack(self, "LambdaStack", dynamo_db_stack=dynamo_db_stack, bucket=bucket)
+        ApiGatewayStack(self, "ApiGatewayStack", lambda_stack=lambda_stack)

@@ -17,7 +17,19 @@ async def list_exceptions():
 async def create_exception(related_id: str, error_type: str, error_message: str, severity: str = "Medium"):
     async with httpx.AsyncClient() as client:
         now = datetime.utcnow().isoformat()
-        payload = {"fields": {"related_id": related_id, "error_type": error_type, "error_message": error_message, "severity": severity, "status": "Open", "created_at": now, "created_by": "System", "updated_at": now, "updated_by": "System"}}
+        payload = {
+            "fields": {
+                "related_id": related_id, 
+                "error_type": error_type, 
+                "error_message": error_message, 
+                "severity": severity, 
+                "status": "Open", 
+                "created_at": now, 
+                "created_by": "System", 
+                "updated_at": now, 
+                "updated_by": "System"
+                }
+            }
         resp = await client.post(f"{BASE_URL}/Exceptions", headers=HEADERS, json=payload)
         if resp.status_code != 200:
             raise HTTPException(status_code=resp.status_code, detail=resp.text)

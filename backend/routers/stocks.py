@@ -40,14 +40,35 @@ async def receive_goods(sku: str, quantity: int, location: str, rack: str, recei
             stock_id = stock_data["records"][0]["id"]
             now = datetime.utcnow().isoformat()
             
-            receipt_payload = {"fields": {"link_sku": [stock_id], "quantity": quantity, "location": location, "rack": rack, "received_by": received_by, "status": "Completed", "created_at": now, "created_by": received_by, "updated_at": now, "updated_by": received_by}}
+            receipt_payload = {
+                "fields": {
+                    "link_sku": [stock_id], 
+                    "quantity": quantity, 
+                    "location": location, 
+                    "rack": rack, 
+                    "received_by": received_by, 
+                    "status": "Completed", 
+                    "created_at": now, 
+                    "created_by": received_by, 
+                    "updated_at": now, 
+                    "updated_by": received_by
+                }
+            }
+            
             receipt_resp = await client.post(f"{BASE_URL}/Good_Receipts", headers=HEADERS, json=receipt_payload)
             
             if receipt_resp.status_code != 200:
                 raise HTTPException(status_code=receipt_resp.status_code, detail=receipt_resp.text)
             
             current_add = stock_data["records"][0]["fields"].get("add_stock", 0)
-            stock_payload = {"fields": {"add_stock": current_add + quantity, "updated_at": now, "updated_by": received_by}}
+            stock_payload = {
+                "fields": {
+                    "add_stock": current_add + quantity, 
+                    "updated_at": now, 
+                    "updated_by": received_by
+                }
+            }
+            
             await client.patch(f"{BASE_URL}/Stocks/{stock_id}", headers=HEADERS, json=stock_payload)
             
             return {

@@ -2,6 +2,7 @@ import os
 import csv
 import boto3
 import httpx
+from datetime import datetime
 from io import StringIO
 from aws_lambda_powertools import Logger, Tracer
 from aws_lambda_powertools.utilities.typing import LambdaContext
@@ -10,11 +11,12 @@ s3 = boto3.client('s3')
 logger = Logger()
 tracer = Tracer()
 
-FASTAPI_URL = os.environ['FASTAPI_URL']
+FASTAPI_URL = os.environ.get('FASTAPI_URL')
 
 @tracer.capture_lambda_handler
 def lambda_handler(event, context: LambdaContext):
     results = []
+    today = datetime.today().strftime('%Y-%m-%d')
 
     try:
         for record in event['Records']:
@@ -43,7 +45,7 @@ def lambda_handler(event, context: LambdaContext):
                     resp = client.post(f"{FASTAPI_URL}/orders", json=payload, follow_redirects=False)
                     results.append({'order': customer_id, 'status': resp.status_code, 'response': resp.json() if resp.headers.get('content-type', '').startswith('application/json') else resp.text})
 
-            processed_key = key.replace('orders/', 'processed/', 1)
+            processed_key = key.replace('orders/', f'processed/{today}/', 1)
             s3.copy_object(Bucket=bucket, CopySource={'Bucket': bucket, 'Key': key}, Key=processed_key)
             s3.delete_object(Bucket=bucket, Key=key)
 

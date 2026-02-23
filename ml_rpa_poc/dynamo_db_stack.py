@@ -7,7 +7,7 @@ from .config import PREFIX
 
 class DynamoDBStack(Construct):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
-        super().__init__(scope, construct_id)
+        super().__init__(scope, construct_id, **kwargs)
         
         tableList = [
             'Orders',
