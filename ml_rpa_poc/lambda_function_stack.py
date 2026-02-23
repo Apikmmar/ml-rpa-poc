@@ -1,4 +1,3 @@
-import os
 from aws_cdk import (
     Stack,
     Duration,
@@ -34,6 +33,24 @@ class LambdaStack(Construct):
             compatible_runtimes=[lambda_.Runtime.PYTHON_3_11],
             description="httpx layer"
         )
+        
+        presign_lambda = lambda_.Function(
+            self, "GeneratePresignedURLLambda",
+            function_name=f"{PREFIX}GeneratePresignedURL",
+            runtime=lambda_.Runtime.PYTHON_3_11,
+            handler="lambda_function.lambda_handler",
+            code=lambda_.Code.from_asset("lambda_functions/GeneratePresignedURL"),
+            timeout=Duration.seconds(300),
+            memory_size=128,
+            layers=[powertools_layer],
+            environment={
+                "S3_BUCKET_NAME": bucket.bucket_name
+            }
+        )
+        
+        bucket.grant_read_write(presign_lambda)
+        bucket.grant_put(presign_lambda)
+        self.presign_lambda = presign_lambda
 
         sync_lambda = lambda_.Function(
             self, "SyncAirtableDataLambda",
@@ -66,11 +83,12 @@ class LambdaStack(Construct):
             environment={
                 "TABLE_PREFIX": PREFIX,
                 "S3_BUCKET_NAME": bucket.bucket_name,
-                "FASTAPI_URL": "https://kimberly-unchristian-leo.ngrok-free.dev"
+                "FASTAPI_URL": "https://ml-rpa-poc.onrender.com"
             }
         )
 
         bucket.grant_read_write(csv_lambda)
+        
         csv_lambda.add_event_source(lambda_events.S3EventSource(
             bucket,
             events=[s3.EventType.OBJECT_CREATED],
