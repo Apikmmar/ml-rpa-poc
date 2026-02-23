@@ -1,4 +1,4 @@
-const LAMBDA_URL = 'https://your-api-gateway-url.execute-api.ap-southeast-1.amazonaws.com/prod';
+const LAMBDA_URL = 'https://v9dp2292j8.execute-api.ap-southeast-1.amazonaws.com/prod';
 
 async function uploadCSV() {
     const file = document.getElementById('csvFile').files[0];
