@@ -9,7 +9,6 @@
 /picklists:                /pages/picklists/index.html          200
 /picklists/update:         /pages/picklists/update.html         200
 /picklists/route:          /pages/picklists/route.html          200
-/picklists/qr:             /pages/picklists/qr.html             200
 /transfers:                /pages/transfers/index.html          200
 /transfers/list:           /pages/transfers/list.html           200
 /reports:                  /pages/reports/index.html            200

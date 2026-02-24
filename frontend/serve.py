@@ -12,7 +12,6 @@ ROUTES = {
     "/picklists":                   "/pages/picklists/index.html",
     "/picklists/update":            "/pages/picklists/update.html",
     "/picklists/route":             "/pages/picklists/route.html",
-    "/picklists/qr":                "/pages/picklists/qr.html",
     "/transfers":                   "/pages/transfers/index.html",
     "/transfers/list":              "/pages/transfers/list.html",
     "/reports":                     "/pages/reports/index.html",

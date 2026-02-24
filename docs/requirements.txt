@@ -90,7 +90,6 @@ Input: Order + reserved stock + locations
 Process:
   - Create pick tasks with priorities
   - Optimize picking route (by zone/rack)
-  - Generate barcode/QR codes
   - Post to WMS
 Output: {picklist_id: "", tasks: [], route: []}
 

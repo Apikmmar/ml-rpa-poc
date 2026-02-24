@@ -48,10 +48,3 @@ async def optimize_route(picklist_id: str):
         "picklist_id": picklist_id, 
         "optimized_route": ["Zone-A/Rack-1", "Zone-A/Rack-2", "Zone-B/Rack-1", "Zone-C/Rack-3"]
     }
-
-@router.get("/{picklist_id}/qr")
-async def generate_qr(picklist_id: str):
-    return {
-        "picklist_id": picklist_id, 
-        "qr_data": f"PICKLIST-{picklist_id}"
-    }

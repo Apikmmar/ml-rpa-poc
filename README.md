@@ -81,7 +81,7 @@ cdk deploy
 ### Backend (25 Endpoints)
 - **Orders**: Create, list, get by ID, update status+ETA, reserve stock
 - **Stocks**: List, get by ID, goods receipt, receipts history
-- **Picklists**: List, update status, optimize route, generate QR
+- **Picklists**: List, update status, optimize route
 - **Transfers**: Create, list stock transfers
 - **Reports**: Stock reconciliation, daily summary, weekly summary, list reports
 - **Monitoring**: Exceptions (GET/POST), audit logs, backorders, notifications, metrics dashboard
@@ -90,7 +90,7 @@ cdk deploy
 - **Dashboard**: Home page with navigation
 - **Orders**: Create orders, view all orders, update status with ETA
 - **Stocks**: View inventory, receive goods, track receipts
-- **Picklists**: Manage picklists, optimize routes, generate QR codes
+- **Picklists**: Manage picklists, optimize routes
 - **Transfers**: Create and track stock transfers
 - **Reports**: Stock reconciliation, daily summary, weekly summary, view history
 - **Monitoring**: Metrics dashboard, exceptions, audit logs, backorders, notifications

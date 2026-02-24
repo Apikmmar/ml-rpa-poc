@@ -13,7 +13,6 @@ const NAV_LINKS = [
     { href: '/picklists',                    label: 'All Picklists',        icon: 'bi-list-check' },
     { href: '/picklists/update',             label: 'Update Status',        icon: 'bi-pencil-square' },
     { href: '/picklists/route',              label: 'Optimize Route',       icon: 'bi-map' },
-    { href: '/picklists/qr',                 label: 'Generate QR',          icon: 'bi-qr-code' },
     { group: 'Transfers' },
     { href: '/transfers',                    label: 'Create Transfer',      icon: 'bi-arrow-left-right' },
     { href: '/transfers/list',               label: 'All Transfers',        icon: 'bi-list-ul' },
