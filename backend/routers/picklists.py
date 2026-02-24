@@ -44,7 +44,45 @@ async def update_picklist_status(picklist_id: str, req: UpdateStatusRequest):
 
 @router.get("/{picklist_id}/route")
 async def optimize_route(picklist_id: str):
-    return {
-        "picklist_id": picklist_id, 
-        "optimized_route": ["Zone-A/Rack-1", "Zone-A/Rack-2", "Zone-B/Rack-1", "Zone-C/Rack-3"]
-    }
+    async with httpx.AsyncClient() as client:
+        pl_resp = await client.get(f"{BASE_URL}/Picklists/{picklist_id}", headers=HEADERS)
+        if pl_resp.status_code != 200:
+            raise HTTPException(status_code=pl_resp.status_code, detail=pl_resp.text)
+        pl_fields = pl_resp.json().get("fields", {})
+        order_ids = pl_fields.get("order_id", [])
+        if not order_ids:
+            raise HTTPException(404, "No order linked to this picklist")
+
+        order_id = order_ids[0]
+        items_resp = await client.get(
+            f"{BASE_URL}/Order_Items?filterByFormula={{order_id}}='{order_id}'", headers=HEADERS
+        )
+        items = items_resp.json().get("records", [])
+        if not items:
+            raise HTTPException(404, "No order items found")
+
+        stops = []
+        for item in items:
+            f = item["fields"]
+            sku_ids = f.get("sku", [])
+            if not sku_ids:
+                continue
+            stock_resp = await client.get(f"{BASE_URL}/Stocks/{sku_ids[0]}", headers=HEADERS)
+            if stock_resp.status_code != 200:
+                continue
+            sf = stock_resp.json().get("fields", {})
+            stops.append({
+                "sku": f.get("item_sku") or f.get("lookup_sku", ""),
+                "qty": f.get("qty", 0),
+                "location": sf.get("location", ""),
+                "rack": sf.get("rack", ""),
+                "stop": f"{sf.get('location', '')}/{sf.get('rack', '')}"
+            })
+
+        stops.sort(key=lambda x: (x["location"], x["rack"]))
+        return {
+            "picklist_id": picklist_id,
+            "order_id": order_id,
+            "optimized_route": stops
+        }
+

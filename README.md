@@ -78,13 +78,13 @@ cdk deploy
 
 ## Features
 
-### Backend (25 Endpoints)
-- **Orders**: Create, list, get by ID, update status+ETA, reserve stock
-- **Stocks**: List, get by ID, goods receipt, receipts history
+### Backend (20 Endpoints)
+- **Orders**: Create, list, update status+ETA
+- **Stocks**: List, goods receipt, receipts history
 - **Picklists**: List, update status, optimize route
 - **Transfers**: Create, list stock transfers
 - **Reports**: Stock reconciliation, daily summary, weekly summary, list reports
-- **Monitoring**: Exceptions (GET/POST), audit logs, backorders, notifications, metrics dashboard
+- **Monitoring**: Exceptions (GET), audit logs, backorders, notifications, metrics dashboard
 
 ### Frontend (7 Pages - 100% Coverage)
 - **Dashboard**: Home page with navigation
@@ -119,7 +119,7 @@ S3 (orders/*.csv) → ProcessOrdersCSV Lambda → FastAPI      DynamoDB (read re
 ## Production Path (Full AWS)
 
 To go fully serverless on AWS (abandon Airtable):
-- **25 API Gateway + Lambda** functions (replace FastAPI endpoints)
+- **20 API Gateway + Lambda** functions (replace FastAPI endpoints)
 - **20 backend Lambdas** (replace 19 Airtable automations + 1 SES notification sender)
 - **DynamoDB Streams** to trigger event-driven Lambdas
 - **SES** to replace Airtable Gmail automations
@@ -127,7 +127,7 @@ To go fully serverless on AWS (abandon Airtable):
 
 ## Tech Stack
 
-- **Backend**: Python 3.x, FastAPI, httpx, tenacity, python-dotenv
+- **Backend**: Python 3.x, FastAPI, httpx, python-dotenv
 - **Frontend**: HTML5, CSS3, Vanilla JavaScript
 - **Database**: Airtable (Free Tier) + DynamoDB (sync replica)
 - **Infrastructure**: AWS CDK, Lambda, S3, EventBridge, X-Ray

@@ -1,5 +1,5 @@
-const COGNITO_DOMAIN = "https://ap-southeast-1em2jsvxop.auth.ap-southeast-1.amazoncognito.com";
-const CLIENT_ID = "spd7hjjpqqk9j71erm0tcdbn2";
+const COGNITO_DOMAIN = "https://ap-southeast-1augeyqeun.auth.ap-southeast-1.amazoncognito.com";
+const CLIENT_ID = "ngqr5509uukbre26as02cb0ks";
 const REDIRECT_URI = `${window.location.origin}/index`;
 const LOGOUT_URI = `${window.location.origin}/login`;
 
@@ -28,7 +28,7 @@ function login() {
 
 function logout() {
     sessionStorage.clear();
-    window.location.href = `${COGNITO_DOMAIN}/logout?client_id=${CLIENT_ID}&logout_uri=${encodeURIComponent(LOGOUT_URI)}`;
+    window.location.href = `${COGNITO_DOMAIN}/oauth2/logout?client_id=${CLIENT_ID}&logout_uri=${encodeURIComponent(LOGOUT_URI)}`;
 }
 
 function requireAuth() {
