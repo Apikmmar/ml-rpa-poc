@@ -18,10 +18,12 @@
             <h2>Update Status</h2>
             <input type="text" id="picklistId" placeholder="Picklist ID (rec...)">
             <select id="picklistStatus">
+                <option value="">Select Status</option>
                 <option value="In Progress">In Progress</option>
                 <option value="Completed">Completed</option>
             </select>
             <button onclick="updatePicklistStatus()"><i class="bi bi-pencil"></i> Update Status</button>
+            <button class="btn-outline" onclick="clearPicklistForm()" type="button"><i class="bi bi-x-circle"></i> Clear</button>
             <div id="picklistResult" class="result"></div>
         </div>
     </div>

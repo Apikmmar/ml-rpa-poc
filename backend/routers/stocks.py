@@ -35,7 +35,15 @@ async def receive_goods(sku: str, quantity: int, location: str, rack: str, recei
         stocks = await client.get(f"{BASE_URL}/Stocks?filterByFormula={{sku}}='{sku}'", headers=HEADERS)
         stock_data = stocks.json()
         if stock_data["records"]:
-            stock_id = stock_data["records"][0]["id"]
+            stock_record = stock_data["records"][0]
+            stock_id = stock_record["id"]
+            stock_fields = stock_record["fields"]
+            registered_location = stock_fields.get("location")
+            registered_rack = stock_fields.get("rack")
+            if registered_location and registered_location != location:
+                raise HTTPException(400, f"SKU '{sku}' is registered at {registered_location}, not {location}")
+            if registered_rack and registered_rack != rack:
+                raise HTTPException(400, f"SKU '{sku}' is registered at {registered_rack}, not {rack}")
             now = datetime.utcnow().isoformat()
             
             receipt_payload = {
@@ -58,7 +66,7 @@ async def receive_goods(sku: str, quantity: int, location: str, rack: str, recei
             if receipt_resp.status_code != 200:
                 raise HTTPException(status_code=receipt_resp.status_code, detail=receipt_resp.text)
             
-            current_add = stock_data["records"][0]["fields"].get("add_stock", 0)
+            current_add = stock_fields.get("add_stock", 0)
             stock_payload = {
                 "fields": {
                     "add_stock": current_add + quantity, 

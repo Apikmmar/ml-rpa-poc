@@ -16,14 +16,34 @@
         <h1>Create Transfer</h1>
         <div class="card">
             <h2>New Stock Transfer - ERP Mock</h2>
-            <input type="text" id="fromLocation" placeholder="From Location (Zone-A)">
-            <input type="text" id="toLocation" placeholder="To Location (Zone-B)">
-            <input type="text" id="fromRack" placeholder="From Rack (Rack-1)">
-            <input type="text" id="toRack" placeholder="To Rack (Rack-2)">
+            <select id="fromLocation">
+                <option value="">From Location</option>
+                <option value="Zone-A">Zone-A</option>
+                <option value="Zone-B">Zone-B</option>
+                <option value="Zone-C">Zone-C</option>
+            </select>
+            <select id="toLocation">
+                <option value="">To Location</option>
+                <option value="Zone-A">Zone-A</option>
+                <option value="Zone-B">Zone-B</option>
+                <option value="Zone-C">Zone-C</option>
+            </select>
+            <select id="fromRack">
+                <option value="">From Rack</option>
+                <option value="Rack-1">Rack-1</option>
+                <option value="Rack-2">Rack-2</option>
+                <option value="Rack-3">Rack-3</option>
+            </select>
+            <select id="toRack">
+                <option value="">To Rack</option>
+                <option value="Rack-1">Rack-1</option>
+                <option value="Rack-2">Rack-2</option>
+                <option value="Rack-3">Rack-3</option>
+            </select>
             <input type="text" id="transferSku" placeholder="SKU">
             <input type="number" id="transferQty" placeholder="Quantity" min="1">
-            <input type="text" id="requestedBy" placeholder="Requested By">
             <button onclick="createTransfer()"><i class="bi bi-arrow-left-right"></i> Create Transfer</button>
+            <button class="btn-outline" onclick="clearTransferForm()" type="button"><i class="bi bi-x-circle"></i> Clear</button>
             <div id="transferResult" class="result"></div>
         </div>
     </div>

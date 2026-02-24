@@ -33,14 +33,25 @@ async function listStocks(forceRefresh = false) {
 
 document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('stocksResult')) listStocks();
+    if (document.getElementById('receiptsResult')) listGoodsReceipts();
 });
+
+function clearGoodsForm() {
+    document.getElementById('goodsSku').value = '';
+    document.getElementById('goodsQty').value = '';
+    document.getElementById('goodsLocation').value = '';
+    document.getElementById('goodsRack').value = '';
+    const resultDiv = document.getElementById('goodsResult');
+    resultDiv.textContent = '';
+    resultDiv.style.color = '';
+}
 
 async function receiveGoods() {
     const sku = document.getElementById('goodsSku').value;
     const quantity = document.getElementById('goodsQty').value;
     const location = document.getElementById('goodsLocation').value;
     const rack = document.getElementById('goodsRack').value;
-    const received_by = document.getElementById('receivedBy').value;
+    const received_by = 'System';
     
     if (!sku || !quantity || !location || !rack) {
         showToast('SKU, Quantity, Location and Rack are required', 'warning');
@@ -67,13 +78,17 @@ async function receiveGoods() {
         const result = await fetch(`${API_URL}/stocks/goods-receipt?${params}`, { method: 'POST' });
         
         if (!result.ok) {
-            const errorText = await result.text();
-            throw new Error(`HTTP ${result.status}: ${errorText}`);
+            const json = await result.json();
+            const errMsg = result.status === 404 ? `SKU "${sku}" not found in inventory. Please check the SKU and try again.` : (json.detail || 'Failed to receive goods.');
+            showToast(errMsg, 'error');
+            resultDiv.textContent = errMsg;
+            resultDiv.style.color = 'red';
+            return;
         }
         
         const json = await result.json();
         showToast('Goods received successfully', 'success');
-        resultDiv.textContent = JSON.stringify(json, null, 2);
+        resultDiv.textContent = `${json.quantity} unit(s) of "${json.sku}" received at ${json.location} / ${json.rack}. Receipt ID: ${json.receipt_id}.`;
         resultDiv.style.color = 'green';
     } catch (error) {
         showToast('Failed to receive goods', 'error');
@@ -83,13 +98,14 @@ async function receiveGoods() {
     }
 }
 
-async function listGoodsReceipts() {
+async function listGoodsReceipts(forceRefresh = false) {
     const resultDiv = document.getElementById('receiptsResult');
     resultDiv.style.display = 'block';
     resultDiv.textContent = 'Loading goods receipts...';
 
     try {
-        const result = await fetch(`${API_URL}/stocks/goods-receipts`);
+        const url = forceRefresh ? `${API_URL}/stocks/goods-receipts?refresh=true` : `${API_URL}/stocks/goods-receipts`;
+        const result = await fetch(url);
         const json = await result.json();
         
         if (json.records && json.records.length > 0) {

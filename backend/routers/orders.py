@@ -60,8 +60,8 @@ async def create_order(order: CreateOrderRequest):
         
         _orders_cache["data"] = None  # invalidate cache
         return {
+            "automation": "Order Successfully Created",
             "order_id": order_id, 
-            "automation": "Order Validator triggered"
         }
 
 @router.get("")

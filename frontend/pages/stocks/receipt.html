@@ -18,10 +18,20 @@
             <h2>Receive Goods - ERP Mock</h2>
             <input type="text" id="goodsSku" placeholder="SKU">
             <input type="number" id="goodsQty" placeholder="Quantity" min="1">
-            <input type="text" id="goodsLocation" placeholder="Location">
-            <input type="text" id="goodsRack" placeholder="Rack">
-            <input type="text" id="receivedBy" placeholder="Received By" value="System">
+            <select id="goodsLocation">
+                <option value="">Select Location</option>
+                <option value="Zone-A">Zone-A</option>
+                <option value="Zone-B">Zone-B</option>
+                <option value="Zone-C">Zone-C</option>
+            </select>
+            <select id="goodsRack">
+                <option value="">Select Rack</option>
+                <option value="Rack-1">Rack-1</option>
+                <option value="Rack-2">Rack-2</option>
+                <option value="Rack-3">Rack-3</option>
+            </select>
             <button onclick="receiveGoods()"><i class="bi bi-box-arrow-in-down"></i> Receive Goods</button>
+            <button class="btn-outline" onclick="clearGoodsForm()" type="button"><i class="bi bi-x-circle"></i> Clear</button>
             <div id="goodsResult" class="result"></div>
         </div>
     </div>

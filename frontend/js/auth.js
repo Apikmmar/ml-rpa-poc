@@ -1,7 +1,7 @@
 const COGNITO_DOMAIN = "https://ap-southeast-1augeyqeun.auth.ap-southeast-1.amazoncognito.com";
 const CLIENT_ID = "ngqr5509uukbre26as02cb0ks";
 const REDIRECT_URI = `${window.location.origin}/index`;
-const LOGOUT_URI = `${window.location.origin}/login`;
+const LOGOUT_URI = `${window.location.origin}/pages/auth/login.html`;
 
 // Parse token from URL hash after Cognito redirect
 const _params = new URLSearchParams(window.location.hash.substring(1));
@@ -18,7 +18,7 @@ function getUser() {
     if (!token) return null;
     try {
         const payload = JSON.parse(atob(token.split(".")[1]));
-        return { email: payload.email, groups: payload["cognito:groups"] || [] };
+        return { username: payload["cognito:username"], email: payload.email, groups: payload["cognito:groups"] || [] };
     } catch { return null; }
 }
 
@@ -28,7 +28,7 @@ function login() {
 
 function logout() {
     sessionStorage.clear();
-    window.location.href = `${COGNITO_DOMAIN}/oauth2/logout?client_id=${CLIENT_ID}&logout_uri=${encodeURIComponent(LOGOUT_URI)}`;
+    window.location.href = `${COGNITO_DOMAIN}/logout?client_id=${CLIENT_ID}&logout_uri=${encodeURIComponent(LOGOUT_URI)}`;
 }
 
 function requireAuth() {

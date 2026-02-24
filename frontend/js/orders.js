@@ -19,7 +19,7 @@ function removeItem(button) {
 
 function clearForm() {
     document.getElementById('customerEmail').value = '';
-    document.getElementById('priority').value = 'Normal';
+    document.getElementById('priority').value = '';
     document.getElementById('itemsContainer').innerHTML = '<div class="item-row"><input type="text" placeholder="SKU" class="item-sku"><input type="number" placeholder="Qty" class="item-qty" min="1"><button class="btn-outline" onclick="removeItem(this)" type="button"><i class="bi bi-trash"></i></button></div>';
     const resultDiv = document.getElementById('orderResult');
     resultDiv.textContent = '';
@@ -72,7 +72,7 @@ async function createOrder() {
         
         const json = await result.json();
         showToast('Order created successfully', 'success');
-        resultDiv.textContent = JSON.stringify(json, null, 2);
+        resultDiv.textContent = `Order ${json.order_id} has been created successfully. Validation is now in progress.`;
         resultDiv.style.color = 'green';
     } catch (error) {
         showToast('Failed to create order', 'error');
@@ -93,7 +93,7 @@ async function listOrders(forceRefresh = false) {
         const json = await result.json();
         
         if (json.records && json.records.length > 0) {
-            let table = '<table><thead><tr><th>Record ID</th><th>Customer Email</th><th>Priority</th><th>Status</th><th>Created</th></tr></thead><tbody>';
+            let table = '<table><thead><tr><th>Order ID</th><th>Customer Email</th><th>Priority</th><th>Status</th><th>Created</th></tr></thead><tbody>';
             json.records.forEach(record => {
                 const fields = record.fields;
                 table += `<tr>
@@ -118,11 +118,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('ordersResult')) listOrders();
 });
 
+function clearUpdateForm() {
+    document.getElementById('updateOrderId').value = '';
+    document.getElementById('updateStatus').value = '';
+    document.getElementById('updateEta').value = '';
+    const resultDiv = document.getElementById('updateOrderResult');
+    resultDiv.textContent = '';
+}
+
 async function updateOrderStatus() {
     const orderId = document.getElementById('updateOrderId').value.trim();
     const status = document.getElementById('updateStatus').value;
     const eta = document.getElementById('updateEta').value;
+    const etaRequiredStatuses = ['Picking', 'Ready', 'Shipped'];
     if (!orderId) { showToast('Please enter an Order ID', 'warning'); return; }
+    if (!status) { showToast('Please select a Status', 'warning'); return; }
+    if (etaRequiredStatuses.includes(status) && !eta) { showToast('ETA is required for ' + status, 'warning'); return; }
 
     const resultDiv = document.getElementById('updateOrderResult');
     resultDiv.style.display = 'block';
@@ -137,7 +148,18 @@ async function updateOrderStatus() {
             body: JSON.stringify(body)
         });
         const json = await result.json();
-        resultDiv.textContent = JSON.stringify(json, null, 2);
+        if (!result.ok) {
+            const errCode = json.detail ? (typeof json.detail === 'string' ? JSON.parse(json.detail)?.error : json.detail) : null;
+            const errMsg = errCode === 'NOT_FOUND' ? `Order "${orderId}" not found. Please check the Order ID and try again.` : (errCode || 'Failed to update order status.');
+            showToast(errMsg, 'error');
+            resultDiv.style.color = 'red';
+            resultDiv.textContent = errMsg;
+            return;
+        }
+        showToast('Order status updated', 'success');
+        resultDiv.style.color = 'green';
+        const etaDisplay = json.eta ? new Date(json.eta).toLocaleString() : 'N/A';
+        resultDiv.textContent = `Order ${json.order_id} has been updated to "${json.status}"${json.eta ? ` with ETA ${etaDisplay}` : ''}.`;
     } catch (error) {
         resultDiv.textContent = 'Error: ' + error.message;
     }
