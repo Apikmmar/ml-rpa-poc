@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:8000';
+const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:8000' : 'https://ml-rpa-poc.onrender.com';
 
 function showToast(message, type = 'success', duration = 3000) {
     let container = document.getElementById('toast-container');
