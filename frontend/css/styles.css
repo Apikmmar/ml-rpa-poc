@@ -253,6 +253,8 @@ button.btn-outline:hover { background: var(--bg); }
 .metric-card h3 { font-size: 13px; color: var(--muted); margin-bottom: 8px; font-weight: 500; }
 .metric-card p  { font-size: 22px; font-weight: 700; color: var(--accent); }
 
+.result p, .result ul { margin: 0px 0; }
+
 /* ── Table ── */
 table { width: 100%; border-collapse: collapse; margin-top: 12px; }
 table th { background: var(--bg); color: var(--muted); padding: 10px 12px; text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid var(--border); }

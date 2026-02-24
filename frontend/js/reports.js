@@ -5,7 +5,14 @@ async function generateDailySummary() {
     try {
         const result = await fetch(`${API_URL}/reports/daily`, { method: 'POST' });
         const json = await result.json();
-        resultDiv.textContent = JSON.stringify(json, null, 2);
+        const r = json.report;
+        const byStatus = Object.entries(r.by_status || {}).map(([k, v]) =>
+            `<tr><td>${k}</td><td>${v}</td></tr>`).join('');
+        resultDiv.innerHTML = `
+            <p><strong>Report ID:</strong> ${json.report_id}</p>
+            <p><strong>Date:</strong> ${r.date}</p>
+            <p><strong>Total Orders:</strong> ${r.total_orders}</p>
+            <table><thead><tr><th>Status</th><th>Count</th></tr></thead><tbody>${byStatus}</tbody></table>`;
     } catch (error) {
         resultDiv.textContent = 'Error: ' + error.message;
     }
@@ -18,7 +25,16 @@ async function generateWeeklySummary() {
     try {
         const result = await fetch(`${API_URL}/reports/weekly`, { method: 'POST' });
         const json = await result.json();
-        resultDiv.textContent = JSON.stringify(json, null, 2);
+        const r = json.report;
+        const byStatus = Object.entries(r.by_status || {}).map(([k, v]) =>
+            `<tr><td>${k}</td><td>${v}</td></tr>`).join('');
+        const lowStock = (r.low_stock || []).map(sku => `<li>${sku}</li>`).join('');
+        resultDiv.innerHTML = `
+            <p><strong>Report ID:</strong> ${json.report_id}</p>
+            <p><strong>Week Ending:</strong> ${r.week_ending}</p>
+            <p><strong>Total Orders:</strong> ${r.total_orders} &nbsp;|&nbsp; <strong>Total SKUs:</strong> ${r.total_skus}</p>
+            <table><thead><tr><th>Status</th><th>Count</th></tr></thead><tbody>${byStatus}</tbody></table>
+            <p><strong>Low Stock SKUs:</strong></p><ul>${lowStock || '<li>None</li>'}</ul>`;
     } catch (error) {
         resultDiv.textContent = 'Error: ' + error.message;
     }
