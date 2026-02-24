@@ -1,5 +1,6 @@
 /:                         /pages/index.html                    200
 /index:                    /pages/index.html                    200
+/login:                    /pages/auth/login.html               200
 /orders:                   /pages/orders/index.html             200
 /orders/list:              /pages/orders/list.html              200
 /orders/update:            /pages/orders/update.html            200

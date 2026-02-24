@@ -440,6 +440,7 @@ Backorder Fulfillment Check
 When a record is updated Stock WHERE stock_percentage
 IF stock_percentage > 50
 FIND Backorders WHERE status=Pending AND Backorders.link_sku=Stock.sku
+IF Backorders Records length >= 1
 SEND Gmail
 UPDATE Backorders status=Fulfilled
 CREATE Notifications
