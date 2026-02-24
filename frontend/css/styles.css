@@ -253,7 +253,7 @@ button.btn-outline:hover { background: var(--bg); }
 .metric-card h3 { font-size: 13px; color: var(--muted); margin-bottom: 8px; font-weight: 500; }
 .metric-card p  { font-size: 22px; font-weight: 700; color: var(--accent); }
 
-.result p, .result ul { margin: 0px 0; }
+.result p, .result ul { margin: 2px 0 !important; }
 
 /* ── Table ── */
 table { width: 100%; border-collapse: collapse; margin-top: 12px; }
