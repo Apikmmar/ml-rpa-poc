@@ -25,7 +25,7 @@ async function uploadCSV() {
 
         if (uploadResp.ok) {
             showToast(`Uploaded ${file.name} successfully`, 'success');
-            resultDiv.textContent = `✅ Uploaded ${file.name} — order processing triggered automatically.`;
+            resultDiv.textContent = `Uploaded ${file.name} - order processing triggered automatically.`;
             resultDiv.style.color = 'green';
         } else {
             throw new Error(`Upload failed: ${uploadResp.status}`);
