@@ -5,7 +5,7 @@ async function uploadCSV() {
     const resultDiv = document.getElementById('uploadResult');
 
     if (!file) {
-        alert('Please select a CSV file');
+        showToast('Please select a CSV file', 'warning');
         return;
     }
 
@@ -24,12 +24,14 @@ async function uploadCSV() {
         });
 
         if (uploadResp.ok) {
+            showToast(`Uploaded ${file.name} successfully`, 'success');
             resultDiv.textContent = `✅ Uploaded ${file.name} — order processing triggered automatically.`;
             resultDiv.style.color = 'green';
         } else {
             throw new Error(`Upload failed: ${uploadResp.status}`);
         }
     } catch (error) {
+        showToast('Upload failed', 'error');
         resultDiv.textContent = 'Error: ' + error.message;
         resultDiv.style.color = 'red';
     }

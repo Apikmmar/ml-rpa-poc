@@ -35,8 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function updatePicklistStatus() {
-    const picklistId = document.getElementById('picklistId').value;
+    const picklistId = document.getElementById('picklistId').value.trim();
     const status = document.getElementById('picklistStatus').value;
+    if (!picklistId) { showToast('Please enter a Picklist ID', 'warning'); return; }
 
     const resultDiv = document.getElementById('picklistResult');
     resultDiv.style.display = 'block';
@@ -49,14 +50,17 @@ async function updatePicklistStatus() {
             body: JSON.stringify({ status })
         });
         const json = await result.json();
+        showToast('Picklist status updated', 'success');
         resultDiv.textContent = JSON.stringify(json, null, 2);
     } catch (error) {
+        showToast('Failed to update picklist', 'error');
         resultDiv.textContent = 'Error: ' + error.message;
     }
 }
 
 async function optimizeRoute() {
-    const picklistId = document.getElementById('routePicklistId').value;
+    const picklistId = document.getElementById('routePicklistId').value.trim();
+    if (!picklistId) { showToast('Please enter a Picklist ID', 'warning'); return; }
 
     const resultDiv = document.getElementById('routeResult');
     resultDiv.style.display = 'block';
@@ -65,14 +69,17 @@ async function optimizeRoute() {
     try {
         const result = await fetch(`${API_URL}/picklists/${picklistId}/route`);
         const json = await result.json();
+        showToast('Route optimized', 'success');
         resultDiv.textContent = JSON.stringify(json, null, 2);
     } catch (error) {
+        showToast('Failed to optimize route', 'error');
         resultDiv.textContent = 'Error: ' + error.message;
     }
 }
 
 async function generateQR() {
-    const picklistId = document.getElementById('qrPicklistId').value;
+    const picklistId = document.getElementById('qrPicklistId').value.trim();
+    if (!picklistId) { showToast('Please enter a Picklist ID', 'warning'); return; }
 
     const resultDiv = document.getElementById('qrResult');
     resultDiv.style.display = 'block';
@@ -81,8 +88,10 @@ async function generateQR() {
     try {
         const result = await fetch(`${API_URL}/picklists/${picklistId}/qr`);
         const json = await result.json();
+        showToast('QR code generated', 'success');
         resultDiv.textContent = JSON.stringify(json, null, 2);
     } catch (error) {
+        showToast('Failed to generate QR', 'error');
         resultDiv.textContent = 'Error: ' + error.message;
     }
 }

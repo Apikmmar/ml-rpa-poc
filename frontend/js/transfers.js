@@ -1,13 +1,20 @@
 async function createTransfer() {
-    const params = new URLSearchParams({
-        from_location: document.getElementById('fromLocation').value,
-        to_location: document.getElementById('toLocation').value,
-        from_rack: document.getElementById('fromRack').value,
-        to_rack: document.getElementById('toRack').value,
-        sku: document.getElementById('transferSku').value,
-        quantity: document.getElementById('transferQty').value,
-        requested_by: document.getElementById('requestedBy').value
-    });
+    const from_location = document.getElementById('fromLocation').value.trim();
+    const to_location = document.getElementById('toLocation').value.trim();
+    const from_rack = document.getElementById('fromRack').value.trim();
+    const to_rack = document.getElementById('toRack').value.trim();
+    const sku = document.getElementById('transferSku').value.trim();
+    const quantity = parseInt(document.getElementById('transferQty').value);
+    const requested_by = document.getElementById('requestedBy').value.trim();
+
+    if (!from_location || !to_location || !from_rack || !to_rack || !sku || !requested_by) {
+        showToast('All fields are required', 'warning'); return;
+    }
+    if (!quantity || quantity < 1) {
+        showToast('Quantity must be at least 1', 'warning'); return;
+    }
+
+    const params = new URLSearchParams({ from_location, to_location, from_rack, to_rack, sku, quantity, requested_by });
 
     const resultDiv = document.getElementById('transferResult');
     resultDiv.style.display = 'block';
@@ -16,8 +23,10 @@ async function createTransfer() {
     try {
         const result = await fetch(`${API_URL}/stock-transfers?${params}`, { method: 'POST' });
         const json = await result.json();
+        showToast('Transfer created successfully', 'success');
         resultDiv.textContent = JSON.stringify(json, null, 2);
     } catch (error) {
+        showToast('Failed to create transfer', 'error');
         resultDiv.textContent = 'Error: ' + error.message;
     }
 }

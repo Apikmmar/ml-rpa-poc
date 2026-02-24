@@ -43,7 +43,11 @@ async function receiveGoods() {
     const received_by = document.getElementById('receivedBy').value;
     
     if (!sku || !quantity || !location || !rack) {
-        alert('Please fill in all required fields');
+        showToast('SKU, Quantity, Location and Rack are required', 'warning');
+        return;
+    }
+    if (parseInt(quantity) < 1) {
+        showToast('Quantity must be at least 1', 'warning');
         return;
     }
     
@@ -68,9 +72,11 @@ async function receiveGoods() {
         }
         
         const json = await result.json();
+        showToast('Goods received successfully', 'success');
         resultDiv.textContent = JSON.stringify(json, null, 2);
         resultDiv.style.color = 'green';
     } catch (error) {
+        showToast('Failed to receive goods', 'error');
         resultDiv.textContent = 'Error: ' + error.message;
         resultDiv.style.color = 'red';
         console.error('Receive goods error:', error);

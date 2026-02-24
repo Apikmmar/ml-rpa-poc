@@ -2,7 +2,7 @@ function addItem() {
     const container = document.getElementById('itemsContainer');
     const row = document.createElement('div');
     row.className = 'item-row';
-    row.innerHTML = '<input type="text" placeholder="SKU" class="item-sku"><input type="number" placeholder="Quantity" class="item-qty" min="1"><button onclick="removeItem(this)" type="button">Remove</button>';
+    row.innerHTML = '<input type="text" placeholder="SKU" class="item-sku"><input type="number" placeholder="Qty" class="item-qty" min="1"><button class="btn-outline" onclick="removeItem(this)" type="button"><i class="bi bi-trash"></i></button>';
     container.appendChild(row);
 }
 
@@ -19,47 +19,37 @@ function removeItem(button) {
 
 function clearForm() {
     document.getElementById('customerEmail').value = '';
-    document.getElementById('customerId').value = '';
     document.getElementById('priority').value = 'Normal';
-    document.getElementById('itemsContainer').innerHTML = '<div class="item-row"><input type="text" placeholder="SKU" class="item-sku"><input type="number" placeholder="Quantity" class="item-qty" min="1"><button onclick="removeItem(this)" type="button">Remove</button></div>';
-    document.getElementById('orderResult').style.display = 'none';
+    document.getElementById('itemsContainer').innerHTML = '<div class="item-row"><input type="text" placeholder="SKU" class="item-sku"><input type="number" placeholder="Qty" class="item-qty" min="1"><button class="btn-outline" onclick="removeItem(this)" type="button"><i class="bi bi-trash"></i></button></div>';
+    const resultDiv = document.getElementById('orderResult');
+    resultDiv.textContent = '';
+    resultDiv.style.color = '';
 }
 
 async function createOrder() {
     const customerEmail = document.getElementById('customerEmail');
-    const customerId = document.getElementById('customerId');
     const priority = document.getElementById('priority');
-    
-    if (!customerEmail || !customerId || !priority) {
-        alert('Form elements not found. Please refresh the page (Ctrl+Shift+R)');
-        return;
-    }
-    
+
     if (!customerEmail.value.trim()) {
-        alert('Please enter Customer Email');
-        return;
-    }
-    
-    if (!customerId.value.trim()) {
-        alert('Please enter Customer ID');
+        showToast('Please enter Customer Email', 'warning');
         return;
     }
     
     const items = [];
+    let itemError = false;
     document.querySelectorAll('.item-row').forEach(row => {
-        const sku = row.querySelector('.item-sku').value;
+        const sku = row.querySelector('.item-sku').value.trim();
         const qty = parseInt(row.querySelector('.item-qty').value);
-        if (sku && qty) items.push({ sku, qty });
+        if (sku && qty > 0) items.push({ sku, qty });
+        else if (sku || qty) itemError = true;
     });
-    
-    if (items.length === 0) {
-        alert('Please add at least one item with SKU and Quantity');
-        return;
-    }
+
+    if (itemError) { showToast('Each item must have both SKU and Quantity > 0', 'warning'); return; }
+    if (items.length === 0) { showToast('Please add at least one item', 'warning'); return; }
 
     const data = {
         customer_email: customerEmail.value,
-        customer_id: customerId.value,
+        customer_id: `CUST-${Date.now()}`,
         priority: priority.value,
         items
     };
@@ -81,9 +71,11 @@ async function createOrder() {
         }
         
         const json = await result.json();
+        showToast('Order created successfully', 'success');
         resultDiv.textContent = JSON.stringify(json, null, 2);
         resultDiv.style.color = 'green';
     } catch (error) {
+        showToast('Failed to create order', 'error');
         resultDiv.textContent = 'Error: ' + error.message;
         resultDiv.style.color = 'red';
         console.error('Create order error:', error);
@@ -127,9 +119,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function updateOrderStatus() {
-    const orderId = document.getElementById('updateOrderId').value;
+    const orderId = document.getElementById('updateOrderId').value.trim();
     const status = document.getElementById('updateStatus').value;
     const eta = document.getElementById('updateEta').value;
+    if (!orderId) { showToast('Please enter an Order ID', 'warning'); return; }
 
     const resultDiv = document.getElementById('updateOrderResult');
     resultDiv.style.display = 'block';
