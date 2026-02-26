@@ -13,9 +13,9 @@
     <script>requireAuth();</script>
     <script src="../../js/sidebar.js"></script>
     <div class="container-fluid px-0">
-        <h1>Upload Orders CSV</h1>
+        <h1>Send Orders From ERP/WMS</h1>
         <div class="card">
-            <h2>Upload CSV to S3 - ERP Mock</h2>
+            <h2>Send CSV to S3 - Mock</h2>
             <p class="mb-2" style="color:var(--muted);font-size:13px;">Required columns: <code>customer_email, customer_id, priority, sku, qty</code></p>
             <input type="file" id="csvFile" accept=".csv">
             <button onclick="uploadCSV()"><i class="bi bi-cloud-upload"></i> Upload &amp; Process</button>

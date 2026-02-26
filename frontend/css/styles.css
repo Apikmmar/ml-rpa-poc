@@ -81,6 +81,19 @@ body {
 
 #sidebar.collapsed .sidebar-group { visibility: hidden; }
 
+.sidebar-subgroup {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--accent);
+    padding: 8px 10px 4px 20px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+#sidebar.collapsed .sidebar-subgroup { visibility: hidden; }
+
 .sidebar-link {
     display: flex;
     align-items: center;

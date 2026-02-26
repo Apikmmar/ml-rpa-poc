@@ -1,27 +1,28 @@
 const NAV_LINKS = [
-    { href: '/dashboard',                        label: 'Dashboard',            icon: 'bi-speedometer2' },
-    { group: 'Orders' },
-    { href: '/orders/list',                  label: 'All Orders',           icon: 'bi-bag' },
+    { href: '/dashboard',                    label: 'Dashboard',            icon: 'bi-speedometer2' },
+    { group: 'ERP / WMS Mock' },
+    { subgroup: 'On-Demand' },
     { href: '/orders',                       label: 'Create Order',         icon: 'bi-plus-circle' },
-    { href: '/upload',                       label: 'Upload Orders',           icon: 'bi-cloud-upload' },
-    { href: '/orders/update',                label: 'Update Orders',        icon: 'bi-pencil' },
-    { group: 'Stocks' },
-    { href: '/stocks',                       label: 'All Stocks',           icon: 'bi-box-seam' },
+    { href: '/upload',                       label: 'Upload Orders',        icon: 'bi-cloud-upload' },
     { href: '/stocks/receipt',               label: 'Goods Receipt',        icon: 'bi-box-arrow-in-down' },
-    { href: '/stocks/history',               label: 'Receipt History',      icon: 'bi-clock-history' },
-    { group: 'Picklists' },
-    { href: '/picklists',                    label: 'All Picklists',        icon: 'bi-list-check' },
-    { href: '/picklists/update',             label: 'Update Picklists',        icon: 'bi-pencil-square' },
-    { href: '/picklists/route',              label: 'Optimize Route',       icon: 'bi-map' },
-    { group: 'Transfers' },
-    { href: '/transfers/list',               label: 'All Transfers',        icon: 'bi-list-ul' },
     { href: '/transfers',                    label: 'Create Transfer',      icon: 'bi-arrow-left-right' },
-    { group: 'Reports' },
-    { href: '/reports',                      label: 'All Reports',          icon: 'bi-bar-chart' },
+    { href: '/orders/update',                label: 'Update Orders',        icon: 'bi-pencil' },
+    { href: '/picklists/update',             label: 'Update Picklists',     icon: 'bi-pencil-square' },
+    { href: '/picklists/route',              label: 'Optimize Route',       icon: 'bi-map' },
+    { subgroup: 'Scheduled' },
     { href: '/reports/reconciliation',       label: 'Reconciliation',       icon: 'bi-file-earmark-bar-graph' },
     { href: '/reports/daily',                label: 'Daily Summary',        icon: 'bi-calendar-day' },
     { href: '/reports/weekly',               label: 'Weekly Summary',       icon: 'bi-calendar-week' },
-    { group: 'Monitoring' },
+    { group: 'Warehouse Operations' },
+    { subgroup: 'Fulfillment' },
+    { href: '/orders/list',                  label: 'All Orders',           icon: 'bi-bag' },
+    { href: '/stocks',                       label: 'All Stocks',           icon: 'bi-box-seam' },
+    { href: '/stocks/history',               label: 'Receipt History',      icon: 'bi-clock-history' },
+    { href: '/picklists',                    label: 'All Picklists',        icon: 'bi-list-check' },
+    { href: '/transfers/list',               label: 'All Transfers',        icon: 'bi-list-ul' },
+    { subgroup: 'Reports' },
+    { href: '/reports',                      label: 'All Reports',          icon: 'bi-bar-chart' },
+    { subgroup: 'Monitoring' },
     { href: '/monitoring',                   label: 'Metrics',              icon: 'bi-graph-up' },
     { href: '/monitoring/exceptions',        label: 'Exceptions',           icon: 'bi-exclamation-triangle' },
     { href: '/monitoring/audit',             label: 'Audit Logs',           icon: 'bi-journal-text' },
@@ -35,6 +36,7 @@ const nav = document.createElement('nav');
 nav.className = 'sidebar-nav';
 nav.innerHTML = NAV_LINKS.map(item => {
     if (item.group) return `<div class="sidebar-group">${item.group}</div>`;
+    if (item.subgroup) return `<div class="sidebar-subgroup">${item.subgroup}</div>`;
     return `<a href="${item.href}" class="sidebar-link${item.href === currentPage ? ' active' : ''}">
         <i class="bi ${item.icon}"></i>
         <span class="sidebar-label">${item.label}</span>
