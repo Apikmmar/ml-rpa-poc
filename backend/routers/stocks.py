@@ -8,9 +8,11 @@ router = APIRouter(prefix="/stocks", tags=["stocks"])
 _stocks_cache = {"data": None, "cached_at": None}
 CACHE_TTL = 86400
 
+SORT_PARAMS = "?sort[0][field]=created_at&sort[0][direction]=desc"
+
 async def _fetch_stocks():
     async with httpx.AsyncClient() as client:
-        resp = await client.get(f"{BASE_URL}/Stocks", headers=HEADERS)
+        resp = await client.get(f"{BASE_URL}/Stocks{SORT_PARAMS}", headers=HEADERS)
         if resp.status_code != 200:
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
         _stocks_cache["data"] = resp.json()
@@ -89,7 +91,7 @@ async def receive_goods(sku: str, quantity: int, location: str, rack: str, recei
 @router.get("/goods-receipts")
 async def list_goods_receipts():
     async with httpx.AsyncClient() as client:
-        resp = await client.get(f"{BASE_URL}/Good_Receipts", headers=HEADERS)
+        resp = await client.get(f"{BASE_URL}/Good_Receipts{SORT_PARAMS}", headers=HEADERS)
         if resp.status_code != 200:
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
         return resp.json()

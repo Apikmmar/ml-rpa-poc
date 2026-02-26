@@ -10,9 +10,11 @@ router = APIRouter(prefix="/reports", tags=["reports"])
 _reports_cache = {"data": None, "cached_at": None}
 CACHE_TTL = 86400
 
+SORT_PARAMS = "?sort[0][field]=created_at&sort[0][direction]=desc"
+
 async def _fetch_reports():
     async with httpx.AsyncClient() as client:
-        resp = await client.get(f"{BASE_URL}/Reports", headers=HEADERS)
+        resp = await client.get(f"{BASE_URL}/Reports{SORT_PARAMS}", headers=HEADERS)
         if resp.status_code != 200:
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
         _reports_cache["data"] = resp.json()

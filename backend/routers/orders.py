@@ -9,9 +9,11 @@ router = APIRouter(prefix="/orders", tags=["orders"])
 _orders_cache = {"data": None, "cached_at": None}
 CACHE_TTL = 86400
 
+SORT_PARAMS = "?sort[0][field]=created_at&sort[0][direction]=desc"
+
 async def _fetch_orders():
     async with httpx.AsyncClient() as client:
-        resp = await client.get(f"{BASE_URL}/Orders", headers=HEADERS)
+        resp = await client.get(f"{BASE_URL}/Orders{SORT_PARAMS}", headers=HEADERS)
         if resp.status_code != 200:
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
         _orders_cache["data"] = resp.json()
@@ -89,7 +91,7 @@ async def get_order_items(order_id: str):
 
     async with httpx.AsyncClient() as client:
         resp = await client.get(
-            f"{BASE_URL}/Order_Items?filterByFormula=FIND('{order_id}',ARRAYJOIN({{order_id}}))",
+            f"{BASE_URL}/Order_Items?filterByFormula=FIND('{order_id}',ARRAYJOIN({{order_id}}))&sort[0][field]=created_at&sort[0][direction]=desc",
             headers=HEADERS
         )
         if resp.status_code != 200:

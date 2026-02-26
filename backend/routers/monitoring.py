@@ -24,12 +24,14 @@ def _set(key, data):
     _cache[key]["cached_at"] = datetime.utcnow().timestamp()
     return data
 
+SORT_PARAMS = "?sort[0][field]=created_at&sort[0][direction]=desc"
+
 @router.get("/exceptions")
 async def list_exceptions(refresh: bool = Query(False)):
     if not refresh and not _is_stale("exceptions"):
         return _cache["exceptions"]["data"]
     async with httpx.AsyncClient() as client:
-        resp = await client.get(f"{BASE_URL}/Exceptions", headers=HEADERS)
+        resp = await client.get(f"{BASE_URL}/Exceptions{SORT_PARAMS}", headers=HEADERS)
         if resp.status_code != 200:
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
         return _set("exceptions", resp.json())
@@ -39,17 +41,12 @@ async def list_audit_logs(refresh: bool = Query(False)):
     if not refresh and not _is_stale("audit_logs"):
         return _cache["audit_logs"]["data"]
     async with httpx.AsyncClient() as client:
-        resp = await client.get(f"{BASE_URL}/AuditLogs", headers=HEADERS)
-        if resp.status_code != 200:
-            raise HTTPException(status_code=resp.status_code, detail=resp.text)
-        return _set("audit_logs", resp.json())
-
-@router.get("/backorders")
+        resp = await client.get(f"{BASE_URL}/AuditLogs{SORT_PARAMS}", headers=HEADERS)
 async def list_backorders(refresh: bool = Query(False)):
     if not refresh and not _is_stale("backorders"):
         return _cache["backorders"]["data"]
     async with httpx.AsyncClient() as client:
-        resp = await client.get(f"{BASE_URL}/Backorders", headers=HEADERS)
+        resp = await client.get(f"{BASE_URL}/Backorders{SORT_PARAMS}", headers=HEADERS)
         if resp.status_code != 200:
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
         return _set("backorders", resp.json())
@@ -59,7 +56,7 @@ async def list_notifications(refresh: bool = Query(False)):
     if not refresh and not _is_stale("notifications"):
         return _cache["notifications"]["data"]
     async with httpx.AsyncClient() as client:
-        resp = await client.get(f"{BASE_URL}/Notifications", headers=HEADERS)
+        resp = await client.get(f"{BASE_URL}/Notifications{SORT_PARAMS}", headers=HEADERS)
         if resp.status_code != 200:
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
         return _set("notifications", resp.json())
