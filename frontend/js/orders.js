@@ -93,16 +93,18 @@ async function listOrders(forceRefresh = false) {
         const json = await result.json();
         
         if (json.records && json.records.length > 0) {
-            let table = '<table><thead><tr><th>Order ID</th><th>Customer Email</th><th>Priority</th><th>Status</th><th>Created</th></tr></thead><tbody>';
+            let table = '<table><thead><tr><th></th><th>Order ID</th><th>Customer Email</th><th>Priority</th><th>Status</th><th>Created</th></tr></thead><tbody>';
             json.records.forEach(record => {
                 const fields = record.fields;
-                table += `<tr>
+                table += `<tr style="cursor:pointer" onclick="toggleOrderItems('${record.id}', this)">
+                    <td><i class="bi bi-chevron-right" id="icon-${record.id}"></i></td>
                     <td>${record.id}</td>
                     <td>${fields.customer_email || 'N/A'}</td>
                     <td>${fields.priority || 'N/A'}</td>
                     <td>${fields.status || 'N/A'}</td>
                     <td>${fields.created_at ? new Date(fields.created_at).toLocaleString() : 'N/A'}</td>
-                </tr>`;
+                </tr>
+                <tr id="items-${record.id}" style="display:none"><td colspan="6" style="padding:0"></td></tr>`;
             });
             table += '</tbody></table>';
             resultDiv.innerHTML = table;
@@ -111,6 +113,36 @@ async function listOrders(forceRefresh = false) {
         }
     } catch (error) {
         resultDiv.textContent = 'Error: ' + error.message;
+    }
+}
+
+async function toggleOrderItems(orderId, row) {
+    const itemsRow = document.getElementById(`items-${orderId}`);
+    const icon = document.getElementById(`icon-${orderId}`);
+    if (itemsRow.style.display !== 'none') {
+        itemsRow.style.display = 'none';
+        icon.className = 'bi bi-chevron-right';
+        return;
+    }
+    const cell = itemsRow.querySelector('td');
+    cell.textContent = 'Loading items...';
+    itemsRow.style.display = '';
+    icon.className = 'bi bi-chevron-down';
+    try {
+        const res = await fetch(`${API_URL}/orders/${orderId}/items`);
+        const json = await res.json();
+        if (json.records && json.records.length > 0) {
+            let inner = '<table style="margin:8px 16px;width:calc(100% - 32px)"><thead><tr><th>SKU</th><th>Qty</th></tr></thead><tbody>';
+            json.records.forEach(r => {
+                inner += `<tr><td>${r.fields.sku || 'N/A'}</td><td>${r.fields.qty ?? 'N/A'}</td></tr>`;
+            });
+            inner += '</tbody></table>';
+            cell.innerHTML = inner;
+        } else {
+            cell.textContent = 'No items found.';
+        }
+    } catch (e) {
+        cell.textContent = 'Error loading items: ' + e.message;
     }
 }
 

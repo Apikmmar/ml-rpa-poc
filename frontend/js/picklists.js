@@ -9,11 +9,13 @@ async function listPicklists(forceRefresh = false) {
         const json = await result.json();
         
         if (json.records && json.records.length > 0) {
-            let table = '<table><thead><tr><th>Picklist ID</th><th>Priority</th><th>Status</th><th>Customer Email</th><th>Created</th></tr></thead><tbody>';
+            let table = '<table><thead><tr><th>Picklist ID</th><th>Order ID</th><th>Priority</th><th>Status</th><th>Customer Email</th><th>Created</th></tr></thead><tbody>';
             json.records.forEach(record => {
                 const fields = record.fields;
+                const orderIds = Array.isArray(fields.order_id) ? fields.order_id.join(', ') : (fields.order_id || 'N/A');
                 table += `<tr>
                     <td>${record.id}</td>
+                    <td>${orderIds}</td>
                     <td>${fields.priority || 'N/A'}</td>
                     <td>${fields.status || 'N/A'}</td>
                     <td>${fields.customer_email || 'N/A'}</td>

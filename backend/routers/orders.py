@@ -76,6 +76,36 @@ async def list_orders(refresh: bool = Query(False)):
         return await _fetch_orders()
     return _orders_cache["data"]
 
+_items_cache: dict = {}
+ITEMS_CACHE_TTL = 86400
+
+@router.get("/{order_id}/items")
+async def get_order_items(order_id: str):
+    from routers.stocks import _stocks_cache, _fetch_stocks
+    now_ts = datetime.utcnow().timestamp()
+    cached = _items_cache.get(order_id)
+    if cached and (now_ts - cached["cached_at"]) < ITEMS_CACHE_TTL:
+        return cached["data"]
+
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(
+            f"{BASE_URL}/Order_Items?filterByFormula=FIND('{order_id}',ARRAYJOIN({{order_id}}))",
+            headers=HEADERS
+        )
+        if resp.status_code != 200:
+            raise HTTPException(status_code=resp.status_code, detail=resp.text)
+        data = resp.json()
+
+    # resolve SKU record IDs to SKU strings using stocks cache
+    stocks_data = _stocks_cache["data"] or await _fetch_stocks()
+    sku_map = {r["id"]: r["fields"].get("sku", r["id"]) for r in stocks_data.get("records", [])}
+    for record in data.get("records", []):
+        raw = record["fields"].get("sku", [])
+        record["fields"]["sku"] = ", ".join(sku_map.get(rid, rid) for rid in (raw if isinstance(raw, list) else [raw]))
+
+    _items_cache[order_id] = {"data": data, "cached_at": now_ts}
+    return data
+
 @router.patch("/{order_id}/status")
 async def update_order_status(order_id: str, req: UpdateStatusRequest):
     async with httpx.AsyncClient() as client:
