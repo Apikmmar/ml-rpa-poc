@@ -1,3 +1,27 @@
 {
-  "rewrites": [{ "source": "/", "destination": "/pages/index.html" }]
+  "rewrites": [
+    { "source": "/", "destination": "/pages/index.html" },
+    { "source": "/login", "destination": "/pages/auth/login.html" },
+    { "source": "/orders", "destination": "/pages/orders/index.html" },
+    { "source": "/orders/list", "destination": "/pages/orders/list.html" },
+    { "source": "/orders/update", "destination": "/pages/orders/update.html" },
+    { "source": "/stocks", "destination": "/pages/stocks/index.html" },
+    { "source": "/stocks/receipt", "destination": "/pages/stocks/receipt.html" },
+    { "source": "/stocks/history", "destination": "/pages/stocks/history.html" },
+    { "source": "/picklists", "destination": "/pages/picklists/index.html" },
+    { "source": "/picklists/update", "destination": "/pages/picklists/update.html" },
+    { "source": "/picklists/route", "destination": "/pages/picklists/route.html" },
+    { "source": "/transfers", "destination": "/pages/transfers/index.html" },
+    { "source": "/transfers/list", "destination": "/pages/transfers/list.html" },
+    { "source": "/reports", "destination": "/pages/reports/index.html" },
+    { "source": "/reports/daily", "destination": "/pages/reports/daily.html" },
+    { "source": "/reports/weekly", "destination": "/pages/reports/weekly.html" },
+    { "source": "/reports/reconciliation", "destination": "/pages/reports/reconciliation.html" },
+    { "source": "/monitoring", "destination": "/pages/monitoring/index.html" },
+    { "source": "/monitoring/audit", "destination": "/pages/monitoring/audit.html" },
+    { "source": "/monitoring/backorders", "destination": "/pages/monitoring/backorders.html" },
+    { "source": "/monitoring/exceptions", "destination": "/pages/monitoring/exceptions.html" },
+    { "source": "/monitoring/notifications", "destination": "/pages/monitoring/notifications.html" },
+    { "source": "/upload", "destination": "/pages/upload/index.html" }
+  ]
 }
