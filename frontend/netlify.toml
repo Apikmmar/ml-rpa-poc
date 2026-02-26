@@ -1,0 +1,119 @@
+[[redirects]]
+  from = "/"
+  to = "/pages/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/dashboard"
+  to = "/pages/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/login"
+  to = "/pages/auth/login.html"
+  status = 200
+
+[[redirects]]
+  from = "/orders"
+  to = "/pages/orders/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/orders/list"
+  to = "/pages/orders/list.html"
+  status = 200
+
+[[redirects]]
+  from = "/orders/update"
+  to = "/pages/orders/update.html"
+  status = 200
+
+[[redirects]]
+  from = "/stocks"
+  to = "/pages/stocks/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/stocks/receipt"
+  to = "/pages/stocks/receipt.html"
+  status = 200
+
+[[redirects]]
+  from = "/stocks/history"
+  to = "/pages/stocks/history.html"
+  status = 200
+
+[[redirects]]
+  from = "/picklists"
+  to = "/pages/picklists/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/picklists/update"
+  to = "/pages/picklists/update.html"
+  status = 200
+
+[[redirects]]
+  from = "/picklists/route"
+  to = "/pages/picklists/route.html"
+  status = 200
+
+[[redirects]]
+  from = "/transfers"
+  to = "/pages/transfers/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/transfers/list"
+  to = "/pages/transfers/list.html"
+  status = 200
+
+[[redirects]]
+  from = "/reports"
+  to = "/pages/reports/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/reports/reconciliation"
+  to = "/pages/reports/reconciliation.html"
+  status = 200
+
+[[redirects]]
+  from = "/reports/daily"
+  to = "/pages/reports/daily.html"
+  status = 200
+
+[[redirects]]
+  from = "/reports/weekly"
+  to = "/pages/reports/weekly.html"
+  status = 200
+
+[[redirects]]
+  from = "/monitoring"
+  to = "/pages/monitoring/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/monitoring/exceptions"
+  to = "/pages/monitoring/exceptions.html"
+  status = 200
+
+[[redirects]]
+  from = "/monitoring/audit"
+  to = "/pages/monitoring/audit.html"
+  status = 200
+
+[[redirects]]
+  from = "/monitoring/backorders"
+  to = "/pages/monitoring/backorders.html"
+  status = 200
+
+[[redirects]]
+  from = "/monitoring/notifications"
+  to = "/pages/monitoring/notifications.html"
+  status = 200
+
+[[redirects]]
+  from = "/upload"
+  to = "/pages/upload/index.html"
+  status = 200

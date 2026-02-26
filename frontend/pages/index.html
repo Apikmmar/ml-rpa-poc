@@ -10,7 +10,10 @@
 </head>
 <body>
     <script src="../js/auth.js"></script>
-    <script>requireAuth();</script>
+    <script>
+        if (location.pathname === '/pages/index.html' && location.hostname !== 'localhost') window.location.replace('/dashboard');
+        requireAuth();
+    </script>
     <script src="../js/sidebar.js"></script>
 
     <div class="container-fluid px-0">

@@ -1,5 +1,5 @@
 const NAV_LINKS = [
-    { href: '/index',                        label: 'Dashboard',            icon: 'bi-speedometer2' },
+    { href: '/dashboard',                        label: 'Dashboard',            icon: 'bi-speedometer2' },
     { group: 'Orders' },
     { href: '/orders/list',                  label: 'All Orders',           icon: 'bi-bag' },
     { href: '/orders',                       label: 'Create Order',         icon: 'bi-plus-circle' },

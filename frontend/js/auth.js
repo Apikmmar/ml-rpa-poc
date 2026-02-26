@@ -1,7 +1,7 @@
 const COGNITO_DOMAIN = "https://ap-southeast-1augeyqeun.auth.ap-southeast-1.amazoncognito.com";
 const CLIENT_ID = "ngqr5509uukbre26as02cb0ks";
-const REDIRECT_URI = `${window.location.origin}/index`;
-const LOGOUT_URI = `${window.location.origin}/pages/auth/login.html`;
+const REDIRECT_URI = `${window.location.origin}/pages/index.html`;
+const LOGOUT_URI = `${window.location.origin}/login`;
 
 // Parse token from URL hash after Cognito redirect
 const _params = new URLSearchParams(window.location.hash.substring(1));
