@@ -42,6 +42,11 @@ async def list_audit_logs(refresh: bool = Query(False)):
         return _cache["audit_logs"]["data"]
     async with httpx.AsyncClient() as client:
         resp = await client.get(f"{BASE_URL}/AuditLogs{SORT_PARAMS}", headers=HEADERS)
+        if resp.status_code != 200:
+            raise HTTPException(status_code=resp.status_code, detail=resp.text)
+        return _set("audit_logs", resp.json())
+
+@router.get("/backorders")
 async def list_backorders(refresh: bool = Query(False)):
     if not refresh and not _is_stale("backorders"):
         return _cache["backorders"]["data"]
