@@ -2,7 +2,7 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 ROUTES = {
     "/":                            "/pages/index.html",
-    "/index":                       "/pages/index.html",
+    "/dashboard":                   "/pages/index.html",
     "/login":                       "/pages/auth/login.html",
     "/orders":                      "/pages/orders/index.html",
     "/orders/list":                 "/pages/orders/list.html",
